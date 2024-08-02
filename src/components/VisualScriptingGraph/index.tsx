@@ -18,6 +18,8 @@ import { componentMap } from './components/fixtures';
 
 import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
+import nodeStateManager from './graph/nodeStateManager';
+import { Component, Argument as ArgumentType } from './components/types';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -110,8 +112,33 @@ const VisualScriptingGraph = () => {
 
     const onDeleteSelected = useCallback(() => {
         setNodes((nds) => nds.filter((node) => !selectedElements.nodes.some((n) => n.id === node.id)));
-        setEdges((eds) => eds.filter((edge) => !selectedElements.edges.some((e) => e.id === edge.id)));
-    }, [selectedElements, setNodes, setEdges]);
+    
+        setEdges((eds) => {
+            const remainingEdges = eds.filter((edge) => !selectedElements.edges.some((e) => e.id === edge.id));
+    
+            selectedElements.edges.forEach((edge) => {
+                const targetNode = nodes.find(node => node.id === edge.target);
+                const targetHandle = edge.targetHandle?.split('-')[0];
+    
+                if (targetNode && targetHandle) {
+                    const setters = nodeStateManager.getNodeSetters(edge.target);
+                    if (setters) {
+                        const isRequired = (targetNode.data as Component).arguments.find((arg: ArgumentType) => arg.name === targetHandle)?.required;
+    
+                        if (isRequired) {
+                            setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: true }));
+                        } else {
+                            setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: false }));
+                        }
+                        
+                        setters.setArgValues((prev) => ({ ...prev, [targetHandle]: '' }));
+                    }
+                }
+            });
+    
+            return remainingEdges;
+        });
+    }, [selectedElements, setNodes, setEdges, nodes]);
 
     return (
         <div className={styles.container}>
