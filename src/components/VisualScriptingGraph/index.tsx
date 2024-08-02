@@ -141,6 +141,41 @@ const VisualScriptingGraph = () => {
         }, 0);
     }, [selectedElements, setNodes, setEdges, nodes]);
 
+    const handleExport = useCallback(() => {
+        const exportData = nodes.map(node => {
+            const nodeData = node.data as Component;
+            const setters = nodeStateManager.getNodeSetters(node.id);
+            
+            let checkedArgs: { [key: string]: boolean } = {};
+            let argValues: { [key: string]: string } = {};
+            
+            if (setters) {
+                setters.setCheckedArgs(prev => {
+                    checkedArgs = prev;
+                    return prev;
+                });
+                setters.setArgValues(prev => {
+                    argValues = prev;
+                    return prev;
+                });
+            }
+            
+            return {
+                name: nodeData.name,
+                label: nodeData.hasLabel ? nodeData.label : undefined,
+                arguments: Object.entries(checkedArgs)
+                    .filter(([_, isChecked]) => isChecked)
+                    .map(([argName, _]) => ({
+                        name: argName,
+                        value: argValues[argName] || ''
+                    }))
+            };
+        });
+    
+        console.log('Exported Data:', exportData);
+        // You can also save this data to a file or send it to a server
+    }, [nodes]);
+
     return (
         <div className={styles.container}>
             <div className={styles.componentPanel}>
@@ -160,6 +195,12 @@ const VisualScriptingGraph = () => {
                 ))}
             </div>
             <div className={styles.flowWrapper}>
+            <button
+                className={styles.exportButton}
+                onClick={handleExport}
+            >
+                Export
+            </button>
                 <button
                     className={styles.deleteButton}
                     onClick={onDeleteSelected}
@@ -232,6 +273,21 @@ const styles = {
         &:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
+        }
+    `,
+    exportButton: css`
+        position: absolute;
+        top: 10px;
+        right: 150px;
+        z-index: 5;
+        padding: 8px 12px;
+        background-color: #FFA500;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        &:hover {
+            background-color: #FF8C00;
         }
     `,
     selectedNode: css`
