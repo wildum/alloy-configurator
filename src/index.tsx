@@ -1,4 +1,5 @@
 import ReactDOM from "react-dom/client";
+import { BrowserRouter as Router } from 'react-router-dom';
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "rc-drawer/assets/index.css";
@@ -17,7 +18,9 @@ root.render(
   <ThemeProvider>
     <ModelProvider>
       <ComponentProvider>
-        <App />
+        <Router>
+          <App />
+        </Router>
       </ComponentProvider>
     </ModelProvider>
   </ThemeProvider>,
