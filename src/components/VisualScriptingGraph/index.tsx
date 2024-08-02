@@ -113,31 +113,32 @@ const VisualScriptingGraph = () => {
     const onDeleteSelected = useCallback(() => {
         setNodes((nds) => nds.filter((node) => !selectedElements.nodes.some((n) => n.id === node.id)));
     
-        setEdges((eds) => {
-            const remainingEdges = eds.filter((edge) => !selectedElements.edges.some((e) => e.id === edge.id));
+        const updates = selectedElements.edges.map((edge) => {
+            const targetNode = nodes.find(node => node.id === edge.target);
+            const targetHandle = edge.targetHandle?.split('-')[0];
     
-            selectedElements.edges.forEach((edge) => {
-                const targetNode = nodes.find(node => node.id === edge.target);
-                const targetHandle = edge.targetHandle?.split('-')[0];
-    
-                if (targetNode && targetHandle) {
-                    const setters = nodeStateManager.getNodeSetters(edge.target);
-                    if (setters) {
-                        const isRequired = (targetNode.data as Component).arguments.find((arg: ArgumentType) => arg.name === targetHandle)?.required;
-    
-                        if (isRequired) {
-                            setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: true }));
-                        } else {
-                            setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: false }));
-                        }
-                        
-                        setters.setArgValues((prev) => ({ ...prev, [targetHandle]: '' }));
-                    }
+            if (targetNode && targetHandle) {
+                const setters = nodeStateManager.getNodeSetters(edge.target);
+                if (setters) {
+                    const isRequired = (targetNode.data as Component).arguments.find((arg: ArgumentType) => arg.name === targetHandle)?.required;
+                    return { setters, targetHandle, isRequired };
                 }
-            });
+            }
+            return null;
+        }).filter(update => update !== null) as { setters: any, targetHandle: string, isRequired: boolean }[];
     
-            return remainingEdges;
-        });
+        setEdges((eds) => eds.filter((edge) => !selectedElements.edges.some((e) => e.id === edge.id)));
+    
+        setTimeout(() => {
+            updates.forEach(({ setters, targetHandle, isRequired }) => {
+                if (isRequired) {
+                    setters.setCheckedArgs((prev: any) => ({ ...prev, [targetHandle]: true }));
+                } else {
+                    setters.setCheckedArgs((prev: any) => ({ ...prev, [targetHandle]: false }));
+                }
+                setters.setArgValues((prev: any) => ({ ...prev, [targetHandle]: '' }));
+            });
+        }, 0);
     }, [selectedElements, setNodes, setEdges, nodes]);
 
     return (
