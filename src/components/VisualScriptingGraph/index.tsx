@@ -33,11 +33,11 @@ function generateRandomString(length: number): string {
 }
 
 const VisualScriptingGraph = () => {
-    const nodeTypes = useMemo(() => ({ componentNode: ComponentNode }), []);
-
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedElements, setSelectedElements] = useState<OnSelectionChangeParams>({ nodes: [], edges: [] });
+
+    const nodeTypes = useMemo(() => ({ componentNode: ComponentNode }), []);
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge(params, eds)),

@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Component } from '../components/types';
 import Argument from './Argument';
-import './ComponentNode.css';
 import Export from './Export';
+import { useReactFlow, Connection } from '@xyflow/react';
+import nodeStateManager from './nodeStateManager';
+import './ComponentNode.css';
 
 type ComponentNodeProps = {
   data: Component;
   id: string;
 };
 
-function ComponentNode({ data, id }: ComponentNodeProps) {
+const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
   const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
     data.arguments.reduce((acc, arg) => {
       acc[arg.name] = arg.required;
@@ -24,6 +26,13 @@ function ComponentNode({ data, id }: ComponentNodeProps) {
     }, {} as { [key: string]: string })
   );
 
+  useEffect(() => {
+    nodeStateManager.setNodeSetters(id, { setCheckedArgs, setArgValues });
+    return () => {
+      nodeStateManager.setNodeSetters(id, null)
+    };
+  }, [id, setCheckedArgs, setArgValues]);
+
   const handleCheckboxChange = (name: string, checked: boolean) => {
     setCheckedArgs((prev) => ({ ...prev, [name]: checked }));
   };
@@ -31,6 +40,22 @@ function ComponentNode({ data, id }: ComponentNodeProps) {
   const handleInputChange = (name: string, value: string) => {
     setArgValues((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleConnect = useCallback((connection: Connection) => {
+      const sourceHandle = connection.sourceHandle?.split('-')[0];
+      const targetHandle = connection.targetHandle?.split('-')[0];
+
+      if (targetHandle) {
+        const setters = nodeStateManager.getNodeSetters(connection.target);
+        if (setters) {
+          setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: true }));
+          setters.setArgValues((prev) => ({
+            ...prev,
+            [targetHandle]: `${connection.source}.${sourceHandle}` || '',
+          }));
+        }
+      }
+  }, []);
 
   return (
     <div className="card">
@@ -50,6 +75,7 @@ function ComponentNode({ data, id }: ComponentNodeProps) {
               onInputChange={handleInputChange}
               nodeId={id}
               value={argValues[arg.name]}
+              onConnect={handleConnect}
             />
           ))}
         </ul>
@@ -62,6 +88,7 @@ function ComponentNode({ data, id }: ComponentNodeProps) {
             <Export
               key={index}
               exp={exp}
+              onConnect={handleConnect}
             />
           ))}
         </ul>
@@ -172,6 +199,6 @@ function ComponentNode({ data, id }: ComponentNodeProps) {
       </div>
     </div>
   );
-}
+};
 
 export default ComponentNode;

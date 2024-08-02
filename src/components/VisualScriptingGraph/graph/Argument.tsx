@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Argument as ArgumentType } from '../components/types';
-import { Handle, Position, useUpdateNodeInternals } from '@xyflow/react';
+import { Handle, Position, useUpdateNodeInternals, Connection } from '@xyflow/react';
 import './Argument.css';
 
 type ArgumentProps = {
@@ -10,9 +10,10 @@ type ArgumentProps = {
   onInputChange: (name: string, value: string) => void;
   nodeId: string;
   value: string;
+  onConnect: (connection: Connection) => void;
 };
 
-const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChange, nodeId, value }) => {
+const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChange, nodeId, value, onConnect }) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,27 +37,19 @@ const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChan
     input.style.width = `${input.scrollWidth}px`;
   };
 
-  const handleConnect = (params: any) => {
-    console.log(params);
-    if (params.targetHandle === `${arg.name}-targetLeft` || params.targetHandle === `${arg.name}-targetRight`) {
-      onChange(arg.name, true);
-      onInputChange(arg.name, params.source);
-    }
-  };
-
   return (
     <li style={{ opacity: checked ? 1 : 0.5 }} className="argument-item">
       <Handle
         id={`${arg.name}-targetLeft`}
         type="target"
         position={Position.Left}
-        onConnect={handleConnect}
+        onConnect={onConnect}
       />
       <Handle
         id={`${arg.name}-targetRight`}
         type="target"
         position={Position.Right}
-        onConnect={handleConnect}
+        onConnect={onConnect}
       />
       <div style={{margin:"10px", display: "flex", alignItems: "center"}}>
         <input
