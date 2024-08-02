@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Handle, Position } from '@xyflow/react';
 import './Argument.css';
 import { Export as ExportType } from '../components/types';

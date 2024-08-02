@@ -22,6 +22,16 @@ import ComponentNode from './graph/ComponentNode';
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
+function generateRandomString(length: number): string {
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters[randomIndex];
+    }
+    return result;
+}
+
 const VisualScriptingGraph = () => {
     const nodeTypes = useMemo(() => ({ componentNode: ComponentNode }), []);
 
@@ -50,11 +60,19 @@ const VisualScriptingGraph = () => {
 
             const position = { x, y };
 
+            const component = structuredClone(componentMap[componentName])
+
+            if (component.hasLabel) {
+                component.label = generateRandomString(6)
+            }
+
+            const id = component.name + (component.hasLabel ? "." + component.label : "");
+
             const newNode: Node = {
-                id: `${componentName}-${Date.now()}`,
+                id: id,
                 type: 'componentNode',
                 position,
-                data: componentMap[componentName],
+                data: component,
             };
 
             setNodes((nds) => nds.concat(newNode));

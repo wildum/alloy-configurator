@@ -1,5 +1,6 @@
 export type Component = {
     name: string;
+    label?: string;
     doc: string;
     hasLabel: boolean;
     arguments: Argument[];

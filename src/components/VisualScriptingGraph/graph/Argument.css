@@ -1,5 +1,12 @@
 .argument-item {
     position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .argument-name {
+    margin-right: 5px;
+    white-space: nowrap;
   }
   
   .argument-name:hover::after {
@@ -24,7 +31,9 @@
     border: 1px solid #ccc;
     background-color: #e8e8e8;
     border-radius: 3px;
-    width: calc(100% - 60px);
+    min-width: 20px;
+    max-width: 100%;
+    flex-grow: 1;
   }
   
   .no-bullets {

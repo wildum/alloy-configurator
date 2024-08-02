@@ -6,9 +6,10 @@ import Export from './Export';
 
 type ComponentNodeProps = {
   data: Component;
+  id: string;
 };
 
-function ComponentNode({ data }: ComponentNodeProps) {
+function ComponentNode({ data, id }: ComponentNodeProps) {
   const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
     data.arguments.reduce((acc, arg) => {
       acc[arg.name] = arg.required;
@@ -23,8 +24,8 @@ function ComponentNode({ data }: ComponentNodeProps) {
     }, {} as { [key: string]: string })
   );
 
-  const handleCheckboxChange = (name: string) => {
-    setCheckedArgs((prev) => ({ ...prev, [name]: !prev[name] }));
+  const handleCheckboxChange = (name: string, checked: boolean) => {
+    setCheckedArgs((prev) => ({ ...prev, [name]: checked }));
   };
 
   const handleInputChange = (name: string, value: string) => {
@@ -34,7 +35,7 @@ function ComponentNode({ data }: ComponentNodeProps) {
   return (
     <div className="card">
       <div>
-        <strong>{data.name}{data.hasLabel ? ' "default"' : ''}</strong>
+        <strong>{data.name}{data.hasLabel ? ` "${data.label}"`  : ''}</strong>
       </div>
       <hr />
       <div>
@@ -45,8 +46,10 @@ function ComponentNode({ data }: ComponentNodeProps) {
               key={index}
               arg={arg}
               checked={checkedArgs[arg.name]}
-              onChange={() => handleCheckboxChange(arg.name)}
+              onChange={handleCheckboxChange}
               onInputChange={handleInputChange}
+              nodeId={id}
+              value={argValues[arg.name]}
             />
           ))}
         </ul>
