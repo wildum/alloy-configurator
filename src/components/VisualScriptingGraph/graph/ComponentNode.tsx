@@ -42,57 +42,61 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
   };
 
   const handleConnect = useCallback((connection: Connection) => {
-      const sourceHandle = connection.sourceHandle?.split('-')[0];
-      const targetHandle = connection.targetHandle?.split('-')[0];
+    const sourceHandle = connection.sourceHandle?.split('-')[0];
+    const targetHandle = connection.targetHandle?.split('-')[0];
 
-      if (targetHandle) {
-        const setters = nodeStateManager.getNodeSetters(connection.target);
-        if (setters) {
-          setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: true }));
-          setters.setArgValues((prev) => ({
-            ...prev,
-            [targetHandle]: `${connection.source}.${sourceHandle}` || '',
-          }));
-        }
+    if (targetHandle) {
+      const setters = nodeStateManager.getNodeSetters(connection.target);
+      if (setters) {
+        setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: true }));
+        setters.setArgValues((prev) => ({
+          ...prev,
+          [targetHandle]: `${connection.source}.${sourceHandle}` || '',
+        }));
       }
+    }
   }, []);
 
   return (
     <div className="card">
       <div>
-        <strong>{data.name}{data.hasLabel ? ` "${data.label}"`  : ''}</strong>
+        <strong>{data.name}{data.hasLabel ? ` "${data.label}"` : ''}</strong>
       </div>
-      <hr />
-      <div>
-        <i>Arguments:</i>
-        <ul className="no-bullets">
-          {data.arguments.map((arg, index) => (
-            <Argument
-              key={index}
-              arg={arg}
-              checked={checkedArgs[arg.name]}
-              onChange={handleCheckboxChange}
-              onInputChange={handleInputChange}
-              nodeId={id}
-              value={argValues[arg.name]}
-              onConnect={handleConnect}
-            />
-          ))}
-        </ul>
-      </div>
-      <hr />
-      <div>
-      <i>Exports:</i>
-        <ul className="no-bullets">
-          {data.exports.map((exp, index) => (
-            <Export
-              key={index}
-              exp={exp}
-              onConnect={handleConnect}
-            />
-          ))}
-        </ul>
-      </div>
+      {data.arguments.length > 0 && (
+        <div>
+          <hr />
+          <i>Arguments:</i>
+          <ul className="no-bullets">
+            {data.arguments.map((arg, index) => (
+              <Argument
+                key={index}
+                arg={arg}
+                checked={checkedArgs[arg.name]}
+                onChange={handleCheckboxChange}
+                onInputChange={handleInputChange}
+                nodeId={id}
+                value={argValues[arg.name]}
+                onConnect={handleConnect}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+      {data.arguments.length > 0 && (
+        <div>
+          <hr />
+          <i>Exports:</i>
+          <ul className="no-bullets">
+            {data.exports.map((exp, index) => (
+              <Export
+                key={index}
+                exp={exp}
+                onConnect={handleConnect}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
       <hr />
     </div>
   );
