@@ -300,7 +300,7 @@ const styles = {
         height: 100vh;
     `,
     componentPanel: css`
-        width: 250px;
+        width: 400px;
         padding: 15px;
         background-color: #f0f0f0;
         border-right: 1px solid #ccc;
