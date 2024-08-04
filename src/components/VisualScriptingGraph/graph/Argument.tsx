@@ -62,16 +62,23 @@ const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChan
         <span title={`${arg.type}\n${arg.doc}`} className="argument-name">
           {arg.name}
         </span>
-        {(arg.required || checked) && (
+        {(arg.required || checked) ? (
           <input
             ref={inputRef}
             id={arg.name}
             name={arg.name}
-            value={value}
+            value={value == undefined ? "null" : value}
             onChange={handleInputChange}
             className="argument-input nodrag"
             style={{minWidth: "20px", maxWidth: "100%"}}
           />
+        ) : (
+          <span 
+            className="argument-value-text nodrag" 
+            style={{color: 'grey', marginLeft: '5px'}}
+          >
+            {value == undefined ? "null" : value}
+          </span>
         )}
       </div>
     </li>
