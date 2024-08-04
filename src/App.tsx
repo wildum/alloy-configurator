@@ -31,7 +31,6 @@ const getStyles = (theme: GrafanaTheme2) => {
       font-family: Inter, Helvetica, Arial, sans-serif;
       min-height: 100vh;
       justify-content: flex-start;
-      padding-bottom: 10em;
     `,
   };
 };

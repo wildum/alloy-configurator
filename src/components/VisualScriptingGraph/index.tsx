@@ -258,6 +258,7 @@ const VisualScriptingGraph = () => {
                     onDrop={onDrop}
                     onSelectionChange={onSelectionChange}
                     selectNodesOnDrag={true}
+                    className={styles.reactFlow}
                 >
                     <Controls />
                     <MiniMap />
@@ -297,7 +298,8 @@ const styles = {
     container: css`
         display: flex;
         width: 100%;
-        height: 100vh;
+        height: 100%;
+        overflow: hidden;
     `,
     componentPanel: css`
         width: 400px;
@@ -305,6 +307,7 @@ const styles = {
         background-color: #f0f0f0;
         border-right: 1px solid #ccc;
         overflow-y: auto;
+        height: 100%;
     `,
     categoryContainer: css`
         margin-bottom: 10px;
@@ -336,6 +339,7 @@ const styles = {
     flowWrapper: css`
         flex-grow: 1;
         position: relative;
+        height: 100%;
     `,
     deleteButton: css`
         position: absolute;
@@ -377,6 +381,10 @@ const styles = {
     selectedEdge: css`
         stroke: #ff6b6b;
         stroke-width: 3;
+    `,
+    reactFlow: css`
+        width: 100%;
+        height: 100%;
     `,
 };
 
