@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import {
     BackgroundVariant,
     ReactFlow,
@@ -20,6 +20,7 @@ import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
 import nodeStateManager from './graph/nodeStateManager';
 import { Component, Argument as ArgumentType } from './components/types';
+import { MarkdownComponentDataSource } from './components/markdown';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -34,12 +35,23 @@ function generateRandomString(length: number): string {
     return result;
 }
 
+// dataSource was used to fetch the components and build the components.json file
+//const dataSource = new MarkdownComponentDataSource("v1.2.1")
+let components = new Map<string, Map<string, Component>>()
+
 const VisualScriptingGraph = () => {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedElements, setSelectedElements] = useState<OnSelectionChangeParams>({ nodes: [], edges: [] });
 
     const nodeTypes = useMemo(() => ({ componentNode: ComponentNode }), []);
+
+    useEffect(() => {
+        loadComponentsFromFile().then(loadedComponents => {
+            components = loadedComponents;
+            console.log(loadedComponents)
+        });
+    }, []);
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -228,6 +240,61 @@ const VisualScriptingGraph = () => {
         </div>
     );
 };
+
+// This function was used to fetch the components info from the doc
+// async function loadData() {
+//     try {
+//         const data = await dataSource.getComponents();
+//         components = data;
+
+//         const componentsObject = Object.fromEntries(
+//             Array.from(components.entries()).map(([key, value]) => [
+//                 key,
+//                 Object.fromEntries(value)
+//             ])
+//         );
+//         const blob = new Blob([JSON.stringify(componentsObject, null, 2)], { type: 'application/json' });
+//         const url = URL.createObjectURL(blob);
+
+//         const a = document.createElement('a');
+//         a.href = url;
+//         a.download = 'components.json';
+//         document.body.appendChild(a);
+//         a.click();
+
+//         document.body.removeChild(a);
+//         URL.revokeObjectURL(url);
+
+//         console.log("Components saved to components.json and downloaded");
+//     } catch (error) {
+//         console.error("Error loading or saving components:", error);
+//     }
+// }
+
+async function loadComponentsFromFile(): Promise<Map<string, Map<string, Component>>> {
+    try {
+        const response = await fetch('/components.json');
+        if (!response.ok) {
+            throw new Error('Failed to fetch components.json');
+        }
+        const componentsObject = await response.json();
+
+        const componentsMap = new Map<string, Map<string, Component>>();
+        
+        for (const [outerKey, innerObject] of Object.entries(componentsObject)) {
+            const innerMap = new Map<string, Component>();
+            for (const [innerKey, component] of Object.entries(innerObject as Record<string, Component>)) {
+                innerMap.set(innerKey, component as Component);
+            }
+            componentsMap.set(outerKey, innerMap);
+        }
+
+        return componentsMap;
+    } catch (error) {
+        console.error("Error loading components from file:", error);
+        return new Map();
+    }
+}
 
 const styles = {
     container: css`
