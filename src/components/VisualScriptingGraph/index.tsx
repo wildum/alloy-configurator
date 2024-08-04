@@ -14,7 +14,6 @@ import {
     OnSelectionChangeParams,
 } from '@xyflow/react';
 import { css } from '@emotion/css';
-import { componentMap } from './components/fixtures';
 
 import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
@@ -35,21 +34,20 @@ function generateRandomString(length: number): string {
     return result;
 }
 
-// dataSource was used to fetch the components and build the components.json file
-//const dataSource = new MarkdownComponentDataSource("v1.2.1")
 let components = new Map<string, Map<string, Component>>()
 
 const VisualScriptingGraph = () => {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedElements, setSelectedElements] = useState<OnSelectionChangeParams>({ nodes: [], edges: [] });
+    const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
     const nodeTypes = useMemo(() => ({ componentNode: ComponentNode }), []);
 
     useEffect(() => {
         loadComponentsFromFile().then(loadedComponents => {
             components = loadedComponents;
-            console.log(loadedComponents)
+            setExpandedCategories(new Set()); // Reset expanded categories when components are loaded
         });
     }, []);
 
@@ -66,7 +64,9 @@ const VisualScriptingGraph = () => {
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
-            const componentName = event.dataTransfer.getData('application/reactflow');
+            const componentData = event.dataTransfer.getData('application/reactflow').split('|');
+            const category = componentData[0];
+            const componentName = componentData[1];
 
             const reactFlowBounds = event.currentTarget.getBoundingClientRect();
             const x = event.clientX - reactFlowBounds.left;
@@ -74,22 +74,24 @@ const VisualScriptingGraph = () => {
 
             const position = { x, y };
 
-            const component = structuredClone(componentMap[componentName])
+            const component = structuredClone(components.get(category)?.get(componentName));
 
-            if (component.hasLabel) {
-                component.label = generateRandomString(6)
+            if (component) {
+                if (component.hasLabel) {
+                    component.label = generateRandomString(6);
+                }
+
+                const id = component.name + (component.hasLabel ? "." + component.label : "");
+
+                const newNode: Node = {
+                    id: id,
+                    type: 'componentNode',
+                    position,
+                    data: component,
+                };
+
+                setNodes((nds) => nds.concat(newNode));
             }
-
-            const id = component.name + (component.hasLabel ? "." + component.label : "");
-
-            const newNode: Node = {
-                id: id,
-                type: 'componentNode',
-                position,
-                data: component,
-            };
-
-            setNodes((nds) => nds.concat(newNode));
         },
         [setNodes]
     );
@@ -185,34 +187,59 @@ const VisualScriptingGraph = () => {
         });
     
         console.log('Exported Data:', exportData);
-        // You can also save this data to a file or send it to a server
     }, [nodes]);
+
+    const toggleCategory = useCallback((category: string) => {
+        setExpandedCategories(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(category)) {
+                newSet.delete(category);
+            } else {
+                newSet.add(category);
+            }
+            return newSet;
+        });
+    }, []);
 
     return (
         <div className={styles.container}>
             <div className={styles.componentPanel}>
                 <h3>Components</h3>
-                {Object.entries(componentMap).map(([name, component]) => (
-                    <div
-                        key={name}
-                        className={styles.draggableItem}
-                        draggable
-                        onDragStart={(event) => {
-                            event.dataTransfer.setData('application/reactflow', name);
-                            event.dataTransfer.effectAllowed = 'move';
-                        }}
-                    >
-                        {name}
+                {Array.from(components.entries()).map(([category, componentMap]) => (
+                    <div key={category} className={styles.categoryContainer}>
+                        <div 
+                            className={styles.categoryHeader}
+                            onClick={() => toggleCategory(category)}
+                        >
+                            {expandedCategories.has(category) ? '▼' : '▶'} {category}
+                        </div>
+                        {expandedCategories.has(category) && (
+                            <div className={styles.componentList}>
+                                {Array.from(componentMap.keys()).map(componentName => (
+                                    <div
+                                        key={componentName}
+                                        className={styles.draggableItem}
+                                        draggable
+                                        onDragStart={(event) => {
+                                            event.dataTransfer.setData('application/reactflow', `${category}|${componentName}`);
+                                            event.dataTransfer.effectAllowed = 'move';
+                                        }}
+                                    >
+                                        {componentName}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
             <div className={styles.flowWrapper}>
-            <button
-                className={styles.exportButton}
-                onClick={handleExport}
-            >
-                Export
-            </button>
+                <button
+                    className={styles.exportButton}
+                    onClick={handleExport}
+                >
+                    Export
+                </button>
                 <button
                     className={styles.deleteButton}
                     onClick={onDeleteSelected}
@@ -240,36 +267,6 @@ const VisualScriptingGraph = () => {
         </div>
     );
 };
-
-// This function was used to fetch the components info from the doc
-// async function loadData() {
-//     try {
-//         const data = await dataSource.getComponents();
-//         components = data;
-
-//         const componentsObject = Object.fromEntries(
-//             Array.from(components.entries()).map(([key, value]) => [
-//                 key,
-//                 Object.fromEntries(value)
-//             ])
-//         );
-//         const blob = new Blob([JSON.stringify(componentsObject, null, 2)], { type: 'application/json' });
-//         const url = URL.createObjectURL(blob);
-
-//         const a = document.createElement('a');
-//         a.href = url;
-//         a.download = 'components.json';
-//         document.body.appendChild(a);
-//         a.click();
-
-//         document.body.removeChild(a);
-//         URL.revokeObjectURL(url);
-
-//         console.log("Components saved to components.json and downloaded");
-//     } catch (error) {
-//         console.error("Error loading or saving components:", error);
-//     }
-// }
 
 async function loadComponentsFromFile(): Promise<Map<string, Map<string, Component>>> {
     try {
@@ -303,14 +300,31 @@ const styles = {
         height: 100vh;
     `,
     componentPanel: css`
-        width: 200px;
+        width: 250px;
         padding: 15px;
         background-color: #f0f0f0;
         border-right: 1px solid #ccc;
+        overflow-y: auto;
+    `,
+    categoryContainer: css`
+        margin-bottom: 10px;
+    `,
+    categoryHeader: css`
+        cursor: pointer;
+        font-weight: bold;
+        padding: 5px;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        &:hover {
+            background-color: #d0d0d0;
+        }
+    `,
+    componentList: css`
+        margin-left: 15px;
     `,
     draggableItem: css`
-        margin: 10px 0;
-        padding: 10px;
+        margin: 5px 0;
+        padding: 8px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -358,12 +372,12 @@ const styles = {
         }
     `,
     selectedNode: css`
-    box-shadow: 0 0 0 0px #ff6b6b;
-`,
+        box-shadow: 0 0 0 0px #ff6b6b;
+    `,
     selectedEdge: css`
-    stroke: #ff6b6b;
-    stroke-width: 3;
-`,
+        stroke: #ff6b6b;
+        stroke-width: 3;
+    `,
 };
 
 export default VisualScriptingGraph;
