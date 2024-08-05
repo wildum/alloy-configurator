@@ -52,7 +52,26 @@ const VisualScriptingGraph = () => {
     }, []);
 
     const onConnect = useCallback(
-        (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+        (params: Connection) => {
+            setEdges((eds) => addEdge(params, eds));
+            const sourceHandleParts = params.sourceHandle?.split('.');
+            const targetHandleParts = params.targetHandle?.split('.');
+            if (sourceHandleParts && targetHandleParts) {
+                const targetHandle = targetHandleParts.slice(0, -1).join('.');
+                const setters = nodeStateManager.getNodeSetters(targetHandle);
+                if (setters) {
+                    const targetArg = targetHandleParts[targetHandleParts.length-1].split("-")[0]
+                    setters.setCheckedArgs((prev) => ({ ...prev, [targetArg]: true }));
+                    setters.setArgValues((prev) => {
+                        const newValues = {
+                            ...prev,
+                            [targetArg]: `${params.source}.${sourceHandleParts[sourceHandleParts.length-1].split("-")[0]}` || '',
+                        };
+                        return newValues;
+                    });
+                }
+            }
+        },
         [setEdges],
     );
 

@@ -5,23 +5,21 @@ import { Export as ExportType } from '../components/types';
 
 type ExportProps = {
   exp: ExportType;
-  onConnect: (connection: Connection) => void;
+  nodeId: string;
 };
 
-const Export: React.FC<ExportProps> = ({ exp, onConnect }) => {
+const Export: React.FC<ExportProps> = ({ exp, nodeId }) => {
   return (
     <li style={{position: "relative"}}>
       <Handle 
-        id={`${exp.name}-sourceLeft`} 
+        id={`${nodeId}.${exp.name}-sourceLeft`} 
         type="source" 
         position={Position.Left}
-        onConnect={onConnect}
       />
       <Handle 
-        id={`${exp.name}-sourceRight`} 
+        id={`${nodeId}.${exp.name}-sourceRight`} 
         type="source" 
         position={Position.Right}
-        onConnect={onConnect}
       />
       <div style={{margin:"10px"}}>
         <span title={`${exp.type}\n${exp.doc}`}>

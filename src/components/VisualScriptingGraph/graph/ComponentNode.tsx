@@ -3,7 +3,7 @@ import { Component } from '../components/types';
 import Argument from './Argument';
 import Export from './Export';
 import Block from './Block';
-import { useReactFlow, Connection } from '@xyflow/react';
+import { Connection } from '@xyflow/react';
 import nodeStateManager from './nodeStateManager';
 import './ComponentNode.css';
 
@@ -42,22 +42,6 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
     setArgValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleConnect = useCallback((connection: Connection) => {
-    const sourceHandle = connection.sourceHandle?.split('-')[0];
-    const targetHandle = connection.targetHandle?.split('-')[0];
-
-    if (targetHandle) {
-      const setters = nodeStateManager.getNodeSetters(connection.target);
-      if (setters) {
-        setters.setCheckedArgs((prev) => ({ ...prev, [targetHandle]: true }));
-        setters.setArgValues((prev) => ({
-          ...prev,
-          [targetHandle]: `${connection.source}.${sourceHandle}` || '',
-        }));
-      }
-    }
-  }, []);
-
   return (
     <div className="card">
       <div>
@@ -77,7 +61,6 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
                 onInputChange={handleInputChange}
                 nodeId={id}
                 value={argValues[arg.name]}
-                onConnect={handleConnect}
               />
             ))}
           </ul>
@@ -91,8 +74,7 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
               <Block
                 key={index}
                 block={block}
-                nodeId={id}
-                onConnect={handleConnect}
+                prefix={id}
               />
             ))}
           </ul>
@@ -107,13 +89,12 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
               <Export
                 key={index}
                 exp={exp}
-                onConnect={handleConnect}
+                nodeId={id}
               />
             ))}
           </ul>
         </div>
       )}
-      <hr />
     </div>
   );
 };

@@ -10,10 +10,9 @@ type ArgumentProps = {
   onInputChange: (name: string, value: string) => void;
   nodeId: string;
   value: string;
-  onConnect: (connection: Connection) => void;
 };
 
-const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChange, nodeId, value, onConnect }) => {
+const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChange, nodeId, value }) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -40,16 +39,14 @@ const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChan
   return (
     <li style={{ opacity: checked ? 1 : 0.5 }} className="argument-item">
       <Handle
-        id={`${arg.name}-targetLeft`}
+        id={`${nodeId}.${arg.name}-targetLeft`}
         type="target"
         position={Position.Left}
-        onConnect={onConnect}
       />
       <Handle
-        id={`${arg.name}-targetRight`}
+        id={`${nodeId}.${arg.name}-targetRight`}
         type="target"
         position={Position.Right}
-        onConnect={onConnect}
       />
       <div style={{margin:"10px", display: "flex", alignItems: "center"}}>
         <input

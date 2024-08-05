@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Connection } from '@xyflow/react';
 import { Block as BlockType } from '../components/types';
 import Argument from './Argument';
 import './Block.css';
+import nodeStateManager from './nodeStateManager';
 
 type BlockProps = {
     block: BlockType;
-    onConnect: (connection: Connection) => void;
-    nodeId: string;
+    prefix: string;
 };
 
-const Block: React.FC<BlockProps> = ({ block, nodeId, onConnect }) => {
+const Block: React.FC<BlockProps> = ({ block, prefix }) => {
+    const id = prefix + "." + block.name
     const [isOpen, setIsOpen] = useState(false);
-    const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
+
+    const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() => 
         block.arguments.reduce((acc, arg) => {
             acc[arg.name] = arg.required;
             return acc;
@@ -26,13 +28,20 @@ const Block: React.FC<BlockProps> = ({ block, nodeId, onConnect }) => {
         }, {} as { [key: string]: string })
     );
 
-    const handleCheckboxChange = (name: string, checked: boolean) => {
+    useEffect(() => {
+        nodeStateManager.setNodeSetters(id, { setCheckedArgs, setArgValues });
+        return () => {
+          nodeStateManager.setNodeSetters(id, null)
+        };
+      }, [id, setCheckedArgs, setArgValues]);
+    
+      const handleCheckboxChange = (name: string, checked: boolean) => {
         setCheckedArgs((prev) => ({ ...prev, [name]: checked }));
-    };
-
-    const handleInputChange = (name: string, value: string) => {
+      };
+    
+      const handleInputChange = (name: string, value: string) => {
         setArgValues((prev) => ({ ...prev, [name]: value }));
-    };
+      };
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -57,9 +66,8 @@ const Block: React.FC<BlockProps> = ({ block, nodeId, onConnect }) => {
                                         checked={checkedArgs[arg.name]}
                                         onChange={handleCheckboxChange}
                                         onInputChange={handleInputChange}
-                                        nodeId={nodeId}
+                                        nodeId={id}
                                         value={argValues[arg.name]}
-                                        onConnect={onConnect}
                                     />
                                 ))}
                             </ul>
@@ -72,8 +80,7 @@ const Block: React.FC<BlockProps> = ({ block, nodeId, onConnect }) => {
                                     <Block
                                         key={index}
                                         block={b}
-                                        onConnect={onConnect}
-                                        nodeId={nodeId}
+                                        prefix={id}
                                     />
                                 ))}
                             </ul>
