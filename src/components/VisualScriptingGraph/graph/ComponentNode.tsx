@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Component } from '../components/types';
 import Argument from './Argument';
 import Export from './Export';
+import Block from './Block';
 import { useReactFlow, Connection } from '@xyflow/react';
 import nodeStateManager from './nodeStateManager';
 import './ComponentNode.css';
@@ -82,7 +83,22 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
           </ul>
         </div>
       )}
-      {data.arguments.length > 0 && (
+      {data.blocks.length > 0 && (
+        <div>
+          <hr />
+          <ul className="no-bullets">
+            {data.blocks.map((block, index) => (
+              <Block
+                key={index}
+                block={block}
+                nodeId={id}
+                onConnect={handleConnect}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+      {data.exports.length > 0 && (
         <div>
           <hr />
           <i>Exports:</i>
