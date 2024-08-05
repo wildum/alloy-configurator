@@ -10,8 +10,8 @@ type BlockProps = {
 };
 
 const Block: React.FC<BlockProps> = ({ block, prefix }) => {
-    const id = prefix + "." + block.name
-    const [isOpen, setIsOpen] = useState(false);
+    const id = `${prefix}.${block.name}`;
+    const [isOpen, setIsOpen] = useState(block.required);
 
     const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() => 
         block.arguments.reduce((acc, arg) => {
@@ -30,7 +30,7 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
         }, {} as { [key: string]: { value: string; type: string } })
     );
 
-    const ExportTypes : {[key: string]: string} = {};
+    const ExportTypes: { [key: string]: string } = {};
 
     useEffect(() => {
         nodeStateManager.setArgsFn(id, { setCheckedArgs, setArgValues, ExportTypes });
@@ -38,27 +38,33 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
             nodeStateManager.setArgsFn(id, null);
         };
     }, [id, setCheckedArgs, setArgValues]);
-    
-      const handleCheckboxChange = (name: string, checked: boolean) => {
-        setCheckedArgs((prev) => ({ ...prev, [name]: checked }));
-      };
-    
-      const handleInputChange = (name: string, value: string) => {
-        setArgValues((prev) => ({
-          ...prev,
-          [name]: { ...prev[name], value }
-        }));
-      };
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
+    const handleCheckboxChange = (name: string, checked: boolean) => {
+        setCheckedArgs((prev) => ({ ...prev, [name]: checked }));
+    };
+
+    const handleInputChange = (name: string, value: string) => {
+        setArgValues((prev) => ({
+            ...prev,
+            [name]: { ...prev[name], value }
+        }));
+    };
+
+    const handleBlockCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setIsOpen(e.target.checked);
     };
 
     return (
         <div className="blockContainer">
-            <div className="blockHeader" onClick={toggleDropdown}>
-                <strong>{block.name}</strong>
-                <span className="arrow">{isOpen ? '▼' : '▶'}</span>
+            <div className="blockHeader">
+                <input
+                    type="checkbox"
+                    checked={isOpen}
+                    onChange={handleBlockCheckboxChange}
+                    className="block-checkbox"
+                    disabled={block.required}
+                />
+                <strong className="blockName">{block.name}</strong>
             </div>
             {isOpen && (
                 <div className="blockContent">

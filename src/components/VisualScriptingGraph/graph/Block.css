@@ -8,12 +8,19 @@
 
 .blockHeader {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 10px 15px;
     background-color: #e9e9e9;
     cursor: pointer;
     border-bottom: 1px solid #ccc;
+}
+
+.block-checkbox {
+    margin-right: 8px;
+}
+
+.blockName {
+    margin-left: 4px;
 }
 
 .blockHeader:hover {
