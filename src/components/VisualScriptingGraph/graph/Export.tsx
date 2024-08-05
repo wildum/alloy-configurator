@@ -22,7 +22,7 @@ const Export: React.FC<ExportProps> = ({ exp, nodeId }) => {
         position={Position.Right}
       />
       <div style={{margin:"10px"}}>
-        <span title={`${exp.type}\n${exp.doc}`}>
+        <span title={`${exp.type}\n${exp.doc}`} className="argument-name">
           {exp.name}
         </span>
       </div>

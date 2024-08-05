@@ -52,22 +52,53 @@ const VisualScriptingGraph = () => {
 
     const onConnect = useCallback(
         (params: Connection) => {
-            setEdges((eds) => addEdge(params, eds));
             const sourceHandleParts = params.sourceHandle?.split('.');
             const targetHandleParts = params.targetHandle?.split('.');
             if (sourceHandleParts && targetHandleParts) {
                 const targetHandle = targetHandleParts.slice(0, -1).join('.');
-                const setters = nodeStateManager.getNodeSetters(targetHandle);
-                if (setters) {
-                    const targetArg = targetHandleParts[targetHandleParts.length-1].split("-")[0]
-                    setters.setCheckedArgs((prev) => ({ ...prev, [targetArg]: true }));
-                    setters.setArgValues((prev) => {
-                        const newValues = {
-                            ...prev,
-                            [targetArg]: `${params.source}.${sourceHandleParts[sourceHandleParts.length-1].split("-")[0]}` || '',
-                        };
+                const sourceHandle = sourceHandleParts.slice(0, -1).join('.');
+                const targetHandleFunctions = nodeStateManager.getArgsFn(targetHandle);
+                const sourceHandleFunctions = nodeStateManager.getArgsFn(sourceHandle);
+                if (targetHandleFunctions && sourceHandleFunctions) {
+                    const targetArg = targetHandleParts[targetHandleParts.length-1].split("-")[0];
+                    const sourceArg = sourceHandleParts[sourceHandleParts.length-1].split("-")[0];
+                    targetHandleFunctions.setCheckedArgs((prev) => ({ ...prev, [targetArg]: true }));
+                    targetHandleFunctions.setArgValues((prevTarget) => {
+                        const newValue = `${params.source}.${sourceHandleParts[sourceHandleParts.length-1].split("-")[0]}` || '';
+                        const newValues = { ...prevTarget };
+
+                        const sourceType = sourceHandleFunctions.ExportTypes[sourceArg]
+                        const targetType = prevTarget[targetArg].type;
+                        const targetValue = prevTarget[targetArg].value;
+
+                        if (sourceType === targetType) {
+                            if (targetType.startsWith("list(") || targetType.startsWith("array")) {
+                                if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
+                                    newValues[targetArg] = {value: newValue, type: targetType};
+                                } else if (targetValue.startsWith("concat")) {
+                                    const trimmedValue = targetValue.slice(0, -2);
+                                    newValues[targetArg] = {value: `${trimmedValue}, ${newValue}])`, type: targetType};
+                                } else {
+                                    const trimmedValue = targetValue.slice(0, -1);
+                                    newValues[targetArg] = {value: `concat(${trimmedValue}, ${newValue}])`, type: targetType};
+                                }
+                            } else {
+                                newValues[targetArg] = {value: newValue, type: targetType};
+                            }
+                            setEdges((eds) => addEdge(params, eds));
+                        } else if (targetType.startsWith('list(') || targetType.startsWith('array(')) {
+                            if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
+                                newValues[targetArg] = {value: `[${newValue}]`, type: targetType};
+                            } else {
+                                const trimmedValue = targetValue.slice(0, -1);
+                                newValues[targetArg] = {value: `${trimmedValue}, ${newValue}]`, type: targetType};
+                            }
+                            setEdges((eds) => addEdge(params, eds));
+                        } else {
+                            console.warn("types are different: ", sourceType, targetType)
+                        }
                         return newValues;
-                    });
+                    })
                 }
             }
         },
@@ -150,7 +181,7 @@ const VisualScriptingGraph = () => {
             const targetHandle = edge.targetHandle?.split('-')[0];
     
             if (targetNode && targetHandle) {
-                const setters = nodeStateManager.getNodeSetters(edge.target);
+                const setters = nodeStateManager.getArgsFn(edge.target);
                 if (setters) {
                     const isRequired = (targetNode.data as Component).arguments.find((arg: ArgumentType) => arg.name === targetHandle)?.required;
                     return { setters, targetHandle, isRequired };
@@ -176,10 +207,10 @@ const VisualScriptingGraph = () => {
     const handleExport = useCallback(() => {
         const exportData = nodes.map(node => {
             const nodeData = node.data as Component;
-            const setters = nodeStateManager.getNodeSetters(node.id);
+            const setters = nodeStateManager.getArgsFn(node.id);
             
             let checkedArgs: { [key: string]: boolean } = {};
-            let argValues: { [key: string]: string } = {};
+            let argValues: { [key: string]: { value: string; type: string } } = {};
             
             if (setters) {
                 setters.setCheckedArgs(prev => {

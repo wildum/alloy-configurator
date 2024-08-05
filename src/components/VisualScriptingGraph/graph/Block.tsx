@@ -20,26 +20,34 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
         }, {} as { [key: string]: boolean })
     );
 
-    const [argValues, setArgValues] = useState<{ [key: string]: string }>(() =>
+    const [argValues, setArgValues] = useState<{ [key: string]: { value: string; type: string } }>(() =>
         block.arguments.reduce((acc, arg) => {
-            acc[arg.name] = arg.default === undefined ? '' : arg.default;
+            acc[arg.name] = {
+                value: arg.default === undefined ? '' : arg.default,
+                type: arg.type
+            };
             return acc;
-        }, {} as { [key: string]: string })
+        }, {} as { [key: string]: { value: string; type: string } })
     );
 
+    const ExportTypes : {[key: string]: string} = {};
+
     useEffect(() => {
-        nodeStateManager.setNodeSetters(id, { setCheckedArgs, setArgValues });
+        nodeStateManager.setArgsFn(id, { setCheckedArgs, setArgValues, ExportTypes });
         return () => {
-          nodeStateManager.setNodeSetters(id, null)
+            nodeStateManager.setArgsFn(id, null);
         };
-      }, [id, setCheckedArgs, setArgValues]);
+    }, [id, setCheckedArgs, setArgValues]);
     
       const handleCheckboxChange = (name: string, checked: boolean) => {
         setCheckedArgs((prev) => ({ ...prev, [name]: checked }));
       };
     
       const handleInputChange = (name: string, value: string) => {
-        setArgValues((prev) => ({ ...prev, [name]: value }));
+        setArgValues((prev) => ({
+          ...prev,
+          [name]: { ...prev[name], value }
+        }));
       };
 
     const toggleDropdown = () => {
@@ -66,7 +74,7 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
                                         onChange={handleCheckboxChange}
                                         onInputChange={handleInputChange}
                                         nodeId={id}
-                                        value={argValues[arg.name]}
+                                        value={argValues[arg.name].value}
                                     />
                                 ))}
                             </ul>

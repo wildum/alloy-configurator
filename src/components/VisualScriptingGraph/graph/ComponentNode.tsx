@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Component } from '../components/types';
 import Argument from './Argument';
 import Export from './Export';
@@ -19,17 +19,27 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
     }, {} as { [key: string]: boolean })
   );
 
-  const [argValues, setArgValues] = useState<{ [key: string]: string }>(() =>
+  const [argValues, setArgValues] = useState<{ [key: string]: { value: string; type: string } }>(() =>
     data.arguments.reduce((acc, arg) => {
-      acc[arg.name] = arg.default === undefined ? '' : arg.default;
-      return acc;
-    }, {} as { [key: string]: string })
-  );
+        acc[arg.name] = {
+            value: arg.default === undefined ? '' : arg.default,
+            type: arg.type
+        };
+        return acc;
+    }, {} as { [key: string]: { value: string; type: string } })
+);
+
+const ExportTypes = useMemo(() => 
+  data.exports.reduce((acc, exp) => {
+    acc[exp.name] = exp.type;
+    return acc;
+  }, {} as { [key: string]: string })
+, [data.exports]);
 
   useEffect(() => {
-    nodeStateManager.setNodeSetters(id, { setCheckedArgs, setArgValues });
+    nodeStateManager.setArgsFn(id, { setCheckedArgs, setArgValues, ExportTypes });
     return () => {
-      nodeStateManager.setNodeSetters(id, null)
+      nodeStateManager.setArgsFn(id, null)
     };
   }, [id, setCheckedArgs, setArgValues]);
 
@@ -38,7 +48,10 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
   };
 
   const handleInputChange = (name: string, value: string) => {
-    setArgValues((prev) => ({ ...prev, [name]: value }));
+    setArgValues((prev) => ({
+      ...prev,
+      [name]: { ...prev[name], value }
+    }));
   };
 
   return (
@@ -59,7 +72,7 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
                 onChange={handleCheckboxChange}
                 onInputChange={handleInputChange}
                 nodeId={id}
-                value={argValues[arg.name]}
+                value={argValues[arg.name].value}
               />
             ))}
           </ul>

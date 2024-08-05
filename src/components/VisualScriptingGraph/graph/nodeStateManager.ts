@@ -1,24 +1,26 @@
 type SetCheckedArgs = React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>;
-type SetArgValues = React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
+type SetArgValues = React.Dispatch<React.SetStateAction<{ [key: string]: { value: string; type: string } }>>;
+type ExportTypes =  {[key: string]: string};
 
-type NodeSetters = {
+type ArgsFn = {
   setCheckedArgs: SetCheckedArgs;
   setArgValues: SetArgValues;
+  ExportTypes: ExportTypes;
 } | null;
 
 const nodeStateManager = {
-  nodeSetters: {} as { [key: string]: NodeSetters },
+  ArgsFn: {} as { [key: string]: ArgsFn },
 
-  setNodeSetters(nodeId: string, setters: NodeSetters) {
-      this.nodeSetters[nodeId] = setters;
+  setArgsFn(nodeId: string, argsFunctions: ArgsFn) {
+      this.ArgsFn[nodeId] = argsFunctions;
   },
 
-  getNodeSetters(nodeId: string): NodeSetters {
-      return this.nodeSetters[nodeId];
+  getArgsFn(nodeId: string): ArgsFn {
+      return this.ArgsFn[nodeId];
   },
 
   getCheckedArgs(nodeId: string): { [key: string]: boolean } {
-      const setters = this.getNodeSetters(nodeId);
+      const setters = this.getArgsFn(nodeId);
       if (setters) {
           let checkedArgs: { [key: string]: boolean } = {};
           setters.setCheckedArgs((prev) => {
