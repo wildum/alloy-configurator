@@ -52,55 +52,56 @@ const VisualScriptingGraph = () => {
 
     const onConnect = useCallback(
         (params: Connection) => {
-            const sourceHandleParts = params.sourceHandle?.split('.');
-            const targetHandleParts = params.targetHandle?.split('.');
-            if (sourceHandleParts && targetHandleParts) {
-                const targetHandle = targetHandleParts.slice(0, -1).join('.');
-                const sourceHandle = sourceHandleParts.slice(0, -1).join('.');
-                const targetHandleFunctions = nodeStateManager.getArgsFn(targetHandle);
-                const sourceHandleFunctions = nodeStateManager.getArgsFn(sourceHandle);
-                if (targetHandleFunctions && sourceHandleFunctions) {
-                    const targetArg = targetHandleParts[targetHandleParts.length-1].split("-")[0];
-                    const sourceArg = sourceHandleParts[sourceHandleParts.length-1].split("-")[0];
-                    targetHandleFunctions.setCheckedArgs((prev) => ({ ...prev, [targetArg]: true }));
-                    targetHandleFunctions.setArgValues((prevTarget) => {
-                        const newValue = `${params.source}.${sourceHandleParts[sourceHandleParts.length-1].split("-")[0]}` || '';
-                        const newValues = { ...prevTarget };
+            setEdges((eds) => addEdge(params, eds));
+            setTimeout(() => {
+                const sourceHandleParts = params.sourceHandle?.split('.');
+                const targetHandleParts = params.targetHandle?.split('.');
+                if (sourceHandleParts && targetHandleParts) {
+                    const targetHandle = targetHandleParts.slice(0, -1).join('.');
+                    const sourceHandle = sourceHandleParts.slice(0, -1).join('.');
+                    const targetHandleFunctions = nodeStateManager.getArgsFn(targetHandle);
+                    const sourceHandleFunctions = nodeStateManager.getArgsFn(sourceHandle);
+                    if (targetHandleFunctions && sourceHandleFunctions) {
+                        const targetArg = targetHandleParts[targetHandleParts.length-1].split("-")[0];
+                        const sourceArg = sourceHandleParts[sourceHandleParts.length-1].split("-")[0];
+                        targetHandleFunctions.setCheckedArgs((prev) => ({ ...prev, [targetArg]: true }));
+                        targetHandleFunctions.setArgValues((prevTarget) => {
+                            const newValue = `${params.source}.${sourceHandleParts[sourceHandleParts.length-1].split("-")[0]}` || '';
+                            const newValues = { ...prevTarget };
 
-                        const sourceType = sourceHandleFunctions.ExportTypes[sourceArg]
-                        const targetType = prevTarget[targetArg].type;
-                        const targetValue = prevTarget[targetArg].value;
+                            const sourceType = sourceHandleFunctions.ExportTypes[sourceArg]
+                            const targetType = prevTarget[targetArg].type;
+                            const targetValue = prevTarget[targetArg].value;
 
-                        if (sourceType === targetType) {
-                            if (targetType.startsWith("list(") || targetType.startsWith("array")) {
-                                if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
+                            if (sourceType === targetType) {
+                                if (targetType.startsWith("list(") || targetType.startsWith("array")) {
+                                    if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
+                                        newValues[targetArg] = {value: newValue, type: targetType};
+                                    } else if (targetValue.startsWith("concat")) {
+                                        const trimmedValue = targetValue.slice(0, -2);
+                                        newValues[targetArg] = {value: `${trimmedValue}, ${newValue}])`, type: targetType};
+                                    } else {
+                                        const trimmedValue = targetValue.slice(0, -1);
+                                        newValues[targetArg] = {value: `concat(${trimmedValue}, ${newValue}])`, type: targetType};
+                                    }
+                                } else {
                                     newValues[targetArg] = {value: newValue, type: targetType};
-                                } else if (targetValue.startsWith("concat")) {
-                                    const trimmedValue = targetValue.slice(0, -2);
-                                    newValues[targetArg] = {value: `${trimmedValue}, ${newValue}])`, type: targetType};
+                                }
+                            } else if (targetType.startsWith('list(') || targetType.startsWith('array(')) {
+                                if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
+                                    newValues[targetArg] = {value: `[${newValue}]`, type: targetType};
                                 } else {
                                     const trimmedValue = targetValue.slice(0, -1);
-                                    newValues[targetArg] = {value: `concat(${trimmedValue}, ${newValue}])`, type: targetType};
+                                    newValues[targetArg] = {value: `${trimmedValue}, ${newValue}]`, type: targetType};
                                 }
                             } else {
-                                newValues[targetArg] = {value: newValue, type: targetType};
+                                console.warn("types are different: ", sourceType, targetType)
                             }
-                            setEdges((eds) => addEdge(params, eds));
-                        } else if (targetType.startsWith('list(') || targetType.startsWith('array(')) {
-                            if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
-                                newValues[targetArg] = {value: `[${newValue}]`, type: targetType};
-                            } else {
-                                const trimmedValue = targetValue.slice(0, -1);
-                                newValues[targetArg] = {value: `${trimmedValue}, ${newValue}]`, type: targetType};
-                            }
-                            setEdges((eds) => addEdge(params, eds));
-                        } else {
-                            console.warn("types are different: ", sourceType, targetType)
-                        }
-                        return newValues;
-                    })
+                            return newValues;
+                        })
+                    }
                 }
-            }
+            }, 0);
         },
         [setEdges],
     );
