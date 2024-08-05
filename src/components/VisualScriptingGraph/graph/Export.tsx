@@ -1,5 +1,5 @@
 import React from 'react';
-import { Handle, Position, Connection } from '@xyflow/react';
+import { Handle, Position } from '@xyflow/react';
 import './Argument.css';
 import { Export as ExportType } from '../components/types';
 

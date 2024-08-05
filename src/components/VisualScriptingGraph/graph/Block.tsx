@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Connection } from '@xyflow/react';
+import React, { useState, useEffect } from 'react';
 import { Block as BlockType } from '../components/types';
 import Argument from './Argument';
 import './Block.css';

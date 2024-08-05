@@ -19,7 +19,6 @@ import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
 import nodeStateManager from './graph/nodeStateManager';
 import { Component, Argument as ArgumentType } from './components/types';
-import { MarkdownComponentDataSource } from './components/markdown';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];

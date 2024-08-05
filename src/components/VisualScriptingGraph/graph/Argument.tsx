@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Argument as ArgumentType } from '../components/types';
-import { Handle, Position, useUpdateNodeInternals, Connection } from '@xyflow/react';
+import { Handle, Position, useUpdateNodeInternals } from '@xyflow/react';
 import './Argument.css';
 
 type ArgumentProps = {

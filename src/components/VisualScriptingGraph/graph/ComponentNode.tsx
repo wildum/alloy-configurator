@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Component } from '../components/types';
 import Argument from './Argument';
 import Export from './Export';
 import Block from './Block';
-import { Connection } from '@xyflow/react';
 import nodeStateManager from './nodeStateManager';
 import './ComponentNode.css';
 
