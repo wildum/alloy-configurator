@@ -19,6 +19,8 @@ import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
 import nodeStateManager from './graph/nodeStateManager';
 import { Component, Argument as ArgumentType, Block as BlockType } from './components/types';
+import { marshallToAlloyConfig } from './marshallers/alloy';
+import { ExportedNode, ExportedArgument, ExportedBlock } from './marshallers/types'
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -31,6 +33,16 @@ function generateRandomString(length: number): string {
         result += characters[randomIndex];
     }
     return result;
+}
+
+function exportToFile(config: string) {
+    const blob = new Blob([config], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'config.alloy';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 let components = new Map<string, Map<string, Component>>()
@@ -46,7 +58,7 @@ const VisualScriptingGraph = () => {
     useEffect(() => {
         loadComponentsFromFile().then(loadedComponents => {
             components = loadedComponents;
-            setExpandedCategories(new Set()); // Reset expanded categories when components are loaded
+            setExpandedCategories(new Set());
         });
     }, []);
 
@@ -206,15 +218,15 @@ const VisualScriptingGraph = () => {
     }, [selectedElements, setNodes, setEdges, nodes]);
 
     const handleExport = useCallback(() => {
-        const exportData = nodes.map(node => {
+        const exportData: ExportedNode[] = nodes.map(node => {
             const nodeData = node.data as Component;
             const nodeState = nodeStateManager.getNodeState(node.id);
-
+    
             if (!nodeState) return null;
-
+    
             const { checkedArgs, argValues } = nodeState;
-
-            const exportArgs = (args: ArgumentType[], checkedArgs: { [key: string]: boolean }, argValues: { [key: string]: { value: string; type: string } }) => {
+    
+            const exportArgs = (args: ArgumentType[], checkedArgs: { [key: string]: boolean }, argValues: { [key: string]: { value: string; type: string } }): ExportedArgument[] => {
                 return Object.entries(checkedArgs)
                     .filter(([_, isChecked]) => isChecked)
                     .map(([argName, _]) => ({
@@ -222,16 +234,16 @@ const VisualScriptingGraph = () => {
                         value: argValues[argName]?.value || ''
                     }));
             };
-
-            const exportBlocks = (blocks: BlockType[], prefix: string): any[] => {
+    
+            const exportBlocks = (blocks: BlockType[], prefix: string): ExportedBlock[] => {
                 return blocks.reduce((acc, block) => {
                     const blockId = `${prefix}.${block.name}`;
                     const blockState = nodeStateManager.getNodeState(blockId);
-
+    
                     if (!blockState) return acc;
-
+    
                     const { checkedArgs: blockCheckedArgs, argValues: blockArgValues, isChecked } = blockState;
-
+    
                     if (isChecked || block.required) {
                         acc.push({
                             name: block.name,
@@ -239,20 +251,21 @@ const VisualScriptingGraph = () => {
                             blocks: exportBlocks(block.blocks, blockId)
                         });
                     }
-
+    
                     return acc;
-                }, [] as any[]);
+                }, [] as ExportedBlock[]);
             };
-
+    
             return {
                 name: nodeData.name,
                 label: nodeData.hasLabel ? nodeData.label : undefined,
                 arguments: exportArgs(nodeData.arguments, checkedArgs, argValues),
                 blocks: exportBlocks(nodeData.blocks, node.id)
             };
-        }).filter(Boolean);
-
-        console.log('Exported Data:', exportData);
+        }).filter((node): node is ExportedNode => node !== null);
+    
+        const alloyConfig = marshallToAlloyConfig(exportData);
+        exportToFile(alloyConfig)
     }, [nodes]);
 
     const toggleCategory = useCallback((category: string) => {
