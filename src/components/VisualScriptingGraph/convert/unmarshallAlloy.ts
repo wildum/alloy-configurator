@@ -27,16 +27,14 @@ const parseArguments = (tokens: string[], index: number): [string, number] => {
     const startToken = tokens[index++]
     let tokenCount = 1
     const endToken = closingToken[startToken]
-    let value = ""
+    let value = startToken
     while (index < tokens.length && tokenCount != 0) {
         if (tokens[index] == endToken) {
             tokenCount--
         } else if (tokens[index] == startToken) {
             tokenCount++
-        } else {
-            value += tokens[index]
         }
-        index++;
+        value += tokens[index++]
     }
     return [value, index];
 };

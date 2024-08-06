@@ -22,6 +22,7 @@ import { Component, Argument as ArgumentType, Block as BlockType } from './compo
 import { marshallToAlloyConfig } from './convert/marshallAlloy';
 import { unmarshallFromAlloyConfig } from './convert/unmarshallAlloy';
 import { ExportedNode, ExportedArgument, ExportedBlock } from './convert/types'
+import { buildGraph } from './graph/buildGraph';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -67,6 +68,7 @@ const VisualScriptingGraph = () => {
         (params: Connection) => {
             setEdges((eds) => addEdge(params, eds));
             setTimeout(() => {
+                console.log(params)
                 const sourceHandleParts = params.sourceHandle?.split('.');
                 const targetHandleParts = params.targetHandle?.split('.');
                 if (sourceHandleParts && targetHandleParts) {
@@ -289,8 +291,11 @@ const VisualScriptingGraph = () => {
                 if (e.target?.result) {
                     const content = e.target.result as string
                     const exportedNodes = unmarshallFromAlloyConfig(content);
-                    
-                    //setNodes((nds) => nds.concat(newNode));
+                    const [nodes, edges] = buildGraph(exportedNodes, components)
+                    console.log(nodes)
+                    console.log(edges)
+                    setNodes((nds) => nodes);
+                    setEdges((edg) => edges);
                 }
             };
             reader.readAsText(file);
