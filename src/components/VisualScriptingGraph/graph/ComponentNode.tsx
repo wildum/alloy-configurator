@@ -21,27 +21,34 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
 
   const [argValues, setArgValues] = useState<{ [key: string]: { value: string; type: string } }>(() =>
     data.arguments.reduce((acc, arg) => {
-        acc[arg.name] = {
-            value: arg.default === undefined ? '' : arg.default,
-            type: arg.type
-        };
-        return acc;
+      acc[arg.name] = {
+        value: arg.default === undefined ? '' : arg.default,
+        type: arg.type
+      };
+      return acc;
     }, {} as { [key: string]: { value: string; type: string } })
-);
+  );
 
-const ExportTypes = useMemo(() => 
-  data.exports.reduce((acc, exp) => {
-    acc[exp.name] = exp.type;
-    return acc;
-  }, {} as { [key: string]: string })
-, [data.exports]);
+  const exportTypes = useMemo(() =>
+    data.exports.reduce((acc, exp) => {
+      acc[exp.name] = exp.type;
+      return acc;
+    }, {} as { [key: string]: string })
+    , [data.exports]);
 
   useEffect(() => {
-    nodeStateManager.setArgsFn(id, { setCheckedArgs, setArgValues, ExportTypes });
+    nodeStateManager.setFn(id, {
+      setCheckedArgs,
+      getCheckedArgs: () => checkedArgs,
+      setArgValues,
+      getArgValues: () => argValues,
+      exportTypes,
+      isChecked: () => true
+    });
     return () => {
-      nodeStateManager.setArgsFn(id, null)
+      nodeStateManager.setFn(id, null)
     };
-  }, [id, setCheckedArgs, setArgValues]);
+  }, [id, checkedArgs, argValues]);
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
     setCheckedArgs((prev) => ({ ...prev, [name]: checked }));

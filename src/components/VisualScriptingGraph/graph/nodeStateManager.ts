@@ -1,36 +1,39 @@
 type SetCheckedArgs = React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>;
 type SetArgValues = React.Dispatch<React.SetStateAction<{ [key: string]: { value: string; type: string } }>>;
+type GetCheckedArgs = () => { [key: string]: boolean };
+type GetArgValues = () => { [key: string]: { value: string; type: string } };
 type ExportTypes =  {[key: string]: string};
+type isChecked = () => boolean
 
-type ArgsFn = {
+type Fns = {
   setCheckedArgs: SetCheckedArgs;
   setArgValues: SetArgValues;
-  ExportTypes: ExportTypes;
+  exportTypes: ExportTypes;
+  isChecked: isChecked;
+  getArgValues: GetArgValues;
+  getCheckedArgs: GetCheckedArgs;
 } | null;
 
 const nodeStateManager = {
-  ArgsFn: {} as { [key: string]: ArgsFn },
-
-  setArgsFn(nodeId: string, argsFunctions: ArgsFn) {
-      this.ArgsFn[nodeId] = argsFunctions;
-  },
-
-  getArgsFn(nodeId: string): ArgsFn {
-      return this.ArgsFn[nodeId];
-  },
-
-  getCheckedArgs(nodeId: string): { [key: string]: boolean } {
-      const setters = this.getArgsFn(nodeId);
-      if (setters) {
-          let checkedArgs: { [key: string]: boolean } = {};
-          setters.setCheckedArgs((prev) => {
-              checkedArgs = prev;
-              return prev;
-          });
-          return checkedArgs;
+    fns: {} as { [key: string]: Fns },
+    setFn(id: string, fns: Fns) {
+      this.fns[id] = fns;
+    },
+    getFns(id: string) {
+      return this.fns[id];
+    },
+    getNodeState(id: string): any {
+      const fns = this.fns[id];
+      if (fns) {
+        return {
+          checkedArgs: fns.getCheckedArgs(),
+          argValues: fns.getArgValues(),
+          isChecked: fns.isChecked(),
+          ExportTypes: fns.exportTypes
+        };
       }
-      return {};
-  },
-};
-
-export default nodeStateManager;
+      return null;
+    }
+  };
+  
+  export default nodeStateManager;

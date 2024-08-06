@@ -11,9 +11,9 @@ type BlockProps = {
 
 const Block: React.FC<BlockProps> = ({ block, prefix }) => {
     const id = `${prefix}.${block.name}`;
-    const [isOpen, setIsOpen] = useState(block.required);
+    const [isChecked, setIsChecked] = useState(block.required);
 
-    const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() => 
+    const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
         block.arguments.reduce((acc, arg) => {
             acc[arg.name] = arg.required;
             return acc;
@@ -30,14 +30,21 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
         }, {} as { [key: string]: { value: string; type: string } })
     );
 
-    const ExportTypes: { [key: string]: string } = {};
+    const exportTypes: { [key: string]: string } = {};
 
     useEffect(() => {
-        nodeStateManager.setArgsFn(id, { setCheckedArgs, setArgValues, ExportTypes });
+        nodeStateManager.setFn(id, {
+            setCheckedArgs,
+            getCheckedArgs: () => checkedArgs,
+            setArgValues,
+            getArgValues: () => argValues,
+            exportTypes,
+            isChecked: () => isChecked
+        });
         return () => {
-            nodeStateManager.setArgsFn(id, null);
+            nodeStateManager.setFn(id, null);
         };
-    }, [id, setCheckedArgs, setArgValues]);
+    }, [id, checkedArgs, argValues, isChecked]);
 
     const handleCheckboxChange = (name: string, checked: boolean) => {
         setCheckedArgs((prev) => ({ ...prev, [name]: checked }));
@@ -51,7 +58,7 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
     };
 
     const handleBlockCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setIsOpen(e.target.checked);
+        setIsChecked(e.target.checked);
     };
 
     return (
@@ -59,14 +66,14 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
             <div className="blockHeader">
                 <input
                     type="checkbox"
-                    checked={isOpen}
+                    checked={isChecked}
                     onChange={handleBlockCheckboxChange}
                     className="block-checkbox"
                     disabled={block.required}
                 />
                 <strong className="blockName">{block.name}</strong>
             </div>
-            {isOpen && (
+            {isChecked && (
                 <div className="blockContent">
                     {block.arguments.length > 0 && (
                         <div className="argumentsSection">

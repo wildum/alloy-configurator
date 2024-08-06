@@ -18,7 +18,7 @@ import { css } from '@emotion/css';
 import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
 import nodeStateManager from './graph/nodeStateManager';
-import { Component, Argument as ArgumentType } from './components/types';
+import { Component, Argument as ArgumentType, Block as BlockType } from './components/types';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -59,40 +59,40 @@ const VisualScriptingGraph = () => {
                 if (sourceHandleParts && targetHandleParts) {
                     const targetHandle = targetHandleParts.slice(0, -1).join('.');
                     const sourceHandle = sourceHandleParts.slice(0, -1).join('.');
-                    const targetHandleFunctions = nodeStateManager.getArgsFn(targetHandle);
-                    const sourceHandleFunctions = nodeStateManager.getArgsFn(sourceHandle);
+                    const targetHandleFunctions = nodeStateManager.getFns(targetHandle);
+                    const sourceHandleFunctions = nodeStateManager.getFns(sourceHandle);
                     if (targetHandleFunctions && sourceHandleFunctions) {
-                        const targetArg = targetHandleParts[targetHandleParts.length-1].split("-")[0];
-                        const sourceArg = sourceHandleParts[sourceHandleParts.length-1].split("-")[0];
+                        const targetArg = targetHandleParts[targetHandleParts.length - 1].split("-")[0];
+                        const sourceArg = sourceHandleParts[sourceHandleParts.length - 1].split("-")[0];
                         targetHandleFunctions.setCheckedArgs((prev) => ({ ...prev, [targetArg]: true }));
                         targetHandleFunctions.setArgValues((prevTarget) => {
-                            const newValue = `${params.source}.${sourceHandleParts[sourceHandleParts.length-1].split("-")[0]}` || '';
+                            const newValue = `${params.source}.${sourceHandleParts[sourceHandleParts.length - 1].split("-")[0]}` || '';
                             const newValues = { ...prevTarget };
 
-                            const sourceType = sourceHandleFunctions.ExportTypes[sourceArg]
+                            const sourceType = sourceHandleFunctions.exportTypes[sourceArg]
                             const targetType = prevTarget[targetArg].type;
                             const targetValue = prevTarget[targetArg].value;
 
                             if (sourceType === targetType) {
                                 if (targetType.startsWith("list(") || targetType.startsWith("array")) {
                                     if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
-                                        newValues[targetArg] = {value: newValue, type: targetType};
+                                        newValues[targetArg] = { value: newValue, type: targetType };
                                     } else if (targetValue.startsWith("concat")) {
                                         const trimmedValue = targetValue.slice(0, -2);
-                                        newValues[targetArg] = {value: `${trimmedValue}, ${newValue}])`, type: targetType};
+                                        newValues[targetArg] = { value: `${trimmedValue}, ${newValue}])`, type: targetType };
                                     } else {
                                         const trimmedValue = targetValue.slice(0, -1);
-                                        newValues[targetArg] = {value: `concat(${trimmedValue}, ${newValue}])`, type: targetType};
+                                        newValues[targetArg] = { value: `concat(${trimmedValue}, ${newValue}])`, type: targetType };
                                     }
                                 } else {
-                                    newValues[targetArg] = {value: newValue, type: targetType};
+                                    newValues[targetArg] = { value: newValue, type: targetType };
                                 }
                             } else if (targetType.startsWith('list(') || targetType.startsWith('array(')) {
                                 if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
-                                    newValues[targetArg] = {value: `[${newValue}]`, type: targetType};
+                                    newValues[targetArg] = { value: `[${newValue}]`, type: targetType };
                                 } else {
                                     const trimmedValue = targetValue.slice(0, -1);
-                                    newValues[targetArg] = {value: `${trimmedValue}, ${newValue}]`, type: targetType};
+                                    newValues[targetArg] = { value: `${trimmedValue}, ${newValue}]`, type: targetType };
                                 }
                             } else {
                                 console.warn("types are different: ", sourceType, targetType)
@@ -153,7 +153,7 @@ const VisualScriptingGraph = () => {
     const selectedNodesIds = useMemo(() => new Set(selectedElements.nodes.map(n => n.id)), [selectedElements.nodes]);
     const selectedEdgesIds = useMemo(() => new Set(selectedElements.edges.map(e => e.id)), [selectedElements.edges]);
 
-    const styledNodes = useMemo(() => 
+    const styledNodes = useMemo(() =>
         nodes.map(node => ({
             ...node,
             style: {
@@ -161,9 +161,9 @@ const VisualScriptingGraph = () => {
                 boxShadow: selectedNodesIds.has(node.id) ? '0 0 0 2px #ff6b6b' : undefined,
             },
         })),
-    [nodes, selectedNodesIds]);
-    
-    const styledEdges = useMemo(() => 
+        [nodes, selectedNodesIds]);
+
+    const styledEdges = useMemo(() =>
         edges.map(edge => ({
             ...edge,
             style: {
@@ -172,17 +172,17 @@ const VisualScriptingGraph = () => {
                 strokeWidth: selectedEdgesIds.has(edge.id) ? 3 : 1,
             },
         })),
-    [edges, selectedEdgesIds]);
+        [edges, selectedEdgesIds]);
 
     const onDeleteSelected = useCallback(() => {
         setNodes((nds) => nds.filter((node) => !selectedElements.nodes.some((n) => n.id === node.id)));
-    
+
         const updates = selectedElements.edges.map((edge) => {
             const targetNode = nodes.find(node => node.id === edge.target);
             const targetHandle = edge.targetHandle?.split('-')[0];
-    
+
             if (targetNode && targetHandle) {
-                const setters = nodeStateManager.getArgsFn(edge.target);
+                const setters = nodeStateManager.getFns(edge.target);
                 if (setters) {
                     const isRequired = (targetNode.data as Component).arguments.find((arg: ArgumentType) => arg.name === targetHandle)?.required;
                     return { setters, targetHandle, isRequired };
@@ -190,9 +190,9 @@ const VisualScriptingGraph = () => {
             }
             return null;
         }).filter(update => update !== null) as { setters: any, targetHandle: string, isRequired: boolean }[];
-    
+
         setEdges((eds) => eds.filter((edge) => !selectedElements.edges.some((e) => e.id === edge.id)));
-    
+
         setTimeout(() => {
             updates.forEach(({ setters, targetHandle, isRequired }) => {
                 if (isRequired) {
@@ -208,34 +208,50 @@ const VisualScriptingGraph = () => {
     const handleExport = useCallback(() => {
         const exportData = nodes.map(node => {
             const nodeData = node.data as Component;
-            const setters = nodeStateManager.getArgsFn(node.id);
-            
-            let checkedArgs: { [key: string]: boolean } = {};
-            let argValues: { [key: string]: { value: string; type: string } } = {};
-            
-            if (setters) {
-                setters.setCheckedArgs(prev => {
-                    checkedArgs = prev;
-                    return prev;
-                });
-                setters.setArgValues(prev => {
-                    argValues = prev;
-                    return prev;
-                });
-            }
-            
-            return {
-                name: nodeData.name,
-                label: nodeData.hasLabel ? nodeData.label : undefined,
-                arguments: Object.entries(checkedArgs)
+            const nodeState = nodeStateManager.getNodeState(node.id);
+
+            if (!nodeState) return null;
+
+            const { checkedArgs, argValues } = nodeState;
+
+            const exportArgs = (args: ArgumentType[], checkedArgs: { [key: string]: boolean }, argValues: { [key: string]: { value: string; type: string } }) => {
+                return Object.entries(checkedArgs)
                     .filter(([_, isChecked]) => isChecked)
                     .map(([argName, _]) => ({
                         name: argName,
-                        value: argValues[argName] || ''
-                    }))
+                        value: argValues[argName]?.value || ''
+                    }));
             };
-        });
-    
+
+            const exportBlocks = (blocks: BlockType[], prefix: string): any[] => {
+                return blocks.reduce((acc, block) => {
+                    const blockId = `${prefix}.${block.name}`;
+                    const blockState = nodeStateManager.getNodeState(blockId);
+
+                    if (!blockState) return acc;
+
+                    const { checkedArgs: blockCheckedArgs, argValues: blockArgValues, isChecked } = blockState;
+
+                    if (isChecked || block.required) {
+                        acc.push({
+                            name: block.name,
+                            arguments: exportArgs(block.arguments, blockCheckedArgs, blockArgValues),
+                            blocks: exportBlocks(block.blocks, blockId)
+                        });
+                    }
+
+                    return acc;
+                }, [] as any[]);
+            };
+
+            return {
+                name: nodeData.name,
+                label: nodeData.hasLabel ? nodeData.label : undefined,
+                arguments: exportArgs(nodeData.arguments, checkedArgs, argValues),
+                blocks: exportBlocks(nodeData.blocks, node.id)
+            };
+        }).filter(Boolean);
+
         console.log('Exported Data:', exportData);
     }, [nodes]);
 
@@ -257,7 +273,7 @@ const VisualScriptingGraph = () => {
                 <h3>Components</h3>
                 {Array.from(components.entries()).map(([category, componentMap]) => (
                     <div key={category} className={styles.categoryContainer}>
-                        <div 
+                        <div
                             className={styles.categoryHeader}
                             onClick={() => toggleCategory(category)}
                         >
@@ -328,7 +344,7 @@ async function loadComponentsFromFile(): Promise<Map<string, Map<string, Compone
         const componentsObject = await response.json();
 
         const componentsMap = new Map<string, Map<string, Component>>();
-        
+
         for (const [outerKey, innerObject] of Object.entries(componentsObject)) {
             const innerMap = new Map<string, Component>();
             for (const [innerKey, component] of Object.entries(innerObject as Record<string, Component>)) {
