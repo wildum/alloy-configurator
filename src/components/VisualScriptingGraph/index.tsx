@@ -19,8 +19,9 @@ import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
 import nodeStateManager from './graph/nodeStateManager';
 import { Component, Argument as ArgumentType, Block as BlockType } from './components/types';
-import { marshallToAlloyConfig } from './marshallers/alloy';
-import { ExportedNode, ExportedArgument, ExportedBlock } from './marshallers/types'
+import { marshallToAlloyConfig } from './convert/marshallAlloy';
+import { unmarshallFromAlloyConfig } from './convert/unmarshallAlloy';
+import { ExportedNode, ExportedArgument, ExportedBlock } from './convert/types'
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -280,6 +281,24 @@ const VisualScriptingGraph = () => {
         });
     }, []);
 
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.name.endsWith('.alloy')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (e.target?.result) {
+                    const content = e.target.result as string
+                    const exportedNodes = unmarshallFromAlloyConfig(content);
+                    
+                    //setNodes((nds) => nds.concat(newNode));
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert('Please select a valid .alloy file.');
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.componentPanel}>
@@ -326,6 +345,19 @@ const VisualScriptingGraph = () => {
                 >
                     Delete Selected
                 </button>
+                <button
+                    className={styles.importButton}
+                    onClick={() => document.getElementById('file-input')?.click()}
+                >
+                    Import
+                </button>
+                <input
+                    type="file"
+                    id="file-input"
+                    style={{ display: 'none' }}
+                    accept=".alloy"
+                    onChange={handleFileSelect}
+                />
                 <ReactFlow
                     nodeTypes={nodeTypes}
                     nodes={styledNodes}
@@ -452,6 +484,21 @@ const styles = {
         cursor: pointer;
         &:hover {
             background-color: #FF8C00;
+        }
+    `,
+    importButton: css`
+        position: absolute;
+        top: 10px;
+        right: 300px;
+        z-index: 6;
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        &:hover {
+            background-color: #0056b3;
         }
     `,
     selectedNode: css`
