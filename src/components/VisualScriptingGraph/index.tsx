@@ -68,7 +68,6 @@ const VisualScriptingGraph = () => {
         (params: Connection) => {
             setEdges((eds) => addEdge(params, eds));
             setTimeout(() => {
-                console.log(params)
                 const sourceHandleParts = params.sourceHandle?.split('.');
                 const targetHandleParts = params.targetHandle?.split('.');
                 if (sourceHandleParts && targetHandleParts) {

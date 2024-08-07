@@ -14,26 +14,13 @@ type ArgumentProps = {
 
 const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChange, nodeId, value }) => {
   const updateNodeInternals = useUpdateNodeInternals();
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     updateNodeInternals(nodeId);
   }, [checked, nodeId, updateNodeInternals]);
 
-  useEffect(() => {
-    if (inputRef.current) {
-      adjustInputWidth(inputRef.current);
-    }
-  }, [value]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onInputChange(arg.name, e.target.value);
-    adjustInputWidth(e.target);
-  };
-
-  const adjustInputWidth = (input: HTMLInputElement) => {
-    input.style.width = 'auto';
-    input.style.width = `${input.scrollWidth}px`;
+    onInputChange(arg.name, e.target.value || "");
   };
 
   return (
@@ -48,7 +35,7 @@ const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChan
         type="target"
         position={Position.Right}
       />
-      <div style={{margin:"10px", display: "flex", alignItems: "center"}}>
+      <div style={{ margin: "10px", display: "flex", alignItems: "center" }}>
         <input
           type="checkbox"
           checked={checked}
@@ -61,20 +48,18 @@ const Argument: React.FC<ArgumentProps> = ({ arg, checked, onChange, onInputChan
         </span>
         {(arg.required || checked) ? (
           <input
-            ref={inputRef}
             id={arg.name}
             name={arg.name}
-            value={value == undefined ? "null" : value}
+            value={value ?? ""}
             onChange={handleInputChange}
             className="argument-input nodrag"
-            style={{minWidth: "20px", maxWidth: "100%"}}
           />
         ) : (
-          <span 
-            className="argument-value-text nodrag" 
-            style={{color: 'grey', marginLeft: '5px'}}
+          <span
+            className="argument-value-text nodrag"
+            style={{ color: 'grey', marginLeft: '5px' }}
           >
-            {value == undefined ? "null" : value}
+            {value ?? ""}
           </span>
         )}
       </div>
