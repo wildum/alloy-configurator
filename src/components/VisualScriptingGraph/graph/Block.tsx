@@ -66,8 +66,11 @@ const Block: React.FC<BlockProps> = ({ block, prefix, onAddBlock, index }) => {
     };
 
     const handleAddBlock = (block: BlockType) => {
-        const newBlock = structuredClone(block)
-        setBlocks((prevBlocks) => [...prevBlocks, { ...newBlock }]);
+        setBlocks((prevBlocks) => {
+              const newBlock = structuredClone(block)
+              prevBlocks.push(newBlock)
+            return prevBlocks
+          });
       };
 
     return (

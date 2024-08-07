@@ -8521,195 +8521,7 @@
           "doc": "Configures a metrics stage.",
           "required": false,
           "arguments": [
-            {
-              "name": "name",
-              "type": "string",
-              "doc": "The metric name.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "action",
-              "type": "string",
-              "doc": "The action to take. Valid actions are set, inc, dec, add, or sub.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "description",
-              "type": "string",
-              "doc": "The metric's description and help text.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "source",
-              "type": "string",
-              "doc": "Key from the extracted data map to use for the metric. Defaults to the metric name.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "prefix",
-              "type": "string",
-              "doc": "The prefix to the metric name.",
-              "required": false,
-              "default": "\"loki_process_custom_\""
-            },
-            {
-              "name": "max_idle_duration",
-              "type": "duration",
-              "doc": "Maximum amount of time to wait until the metric is marked as 'stale' and removed.",
-              "required": false,
-              "default": "\"5m\""
-            },
-            {
-              "name": "value",
-              "type": "string",
-              "doc": "If set, the metric only changes if source exactly matches the value.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "match_all",
-              "type": "bool",
-              "doc": "If set to true, all log lines are counted, without attempting to match the source to the extracted map.",
-              "required": false,
-              "default": "false"
-            },
-            {
-              "name": "count_entry_bytes",
-              "type": "bool",
-              "doc": "If set to true, counts all log lines bytes.",
-              "required": false,
-              "default": "false"
-            },
-            {
-              "name": "Name",
-              "type": "Type",
-              "doc": "Description",
-              "required": false,
-              "default": "Default"
-            },
-            {
-              "name": "---------------------",
-              "type": "------------",
-              "doc": "-------------------------------------------------------------------------------------",
-              "required": false,
-              "default": "--------------------------"
-            },
-            {
-              "name": "name",
-              "type": "string",
-              "doc": "The metric name.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "action",
-              "type": "string",
-              "doc": "The action to take. Valid actions are inc and add.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "description",
-              "type": "string",
-              "doc": "The metric's description and help text.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "source",
-              "type": "string",
-              "doc": "Key from the extracted data map to use for the metric. Defaults to the metric name.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "prefix",
-              "type": "string",
-              "doc": "The prefix to the metric name.",
-              "required": false,
-              "default": "\"loki_process_custom_\""
-            },
-            {
-              "name": "max_idle_duration",
-              "type": "duration",
-              "doc": "Maximum amount of time to wait until the metric is marked as 'stale' and removed.",
-              "required": false,
-              "default": "\"5m\""
-            },
-            {
-              "name": "value",
-              "type": "string",
-              "doc": "If set, the metric only changes if source exactly matches the value.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "Name",
-              "type": "Type",
-              "doc": "Description",
-              "required": false,
-              "default": "Default"
-            },
-            {
-              "name": "---------------------",
-              "type": "---------------",
-              "doc": "-------------------------------------------------------------------------------------",
-              "required": false,
-              "default": "--------------------------"
-            },
-            {
-              "name": "name",
-              "type": "string",
-              "doc": "The metric name.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "buckets",
-              "type": "list(float)",
-              "doc": "The action to take. Valid actions are set, inc, dec, add, or sub.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "description",
-              "type": "string",
-              "doc": "The metric's description and help text.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "source",
-              "type": "string",
-              "doc": "Key from the extracted data map to use for the metric. Defaults to the metric name.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "prefix",
-              "type": "string",
-              "doc": "The prefix to the metric name.",
-              "required": false,
-              "default": "\"loki_process_custom_\""
-            },
-            {
-              "name": "max_idle_duration",
-              "type": "duration",
-              "doc": "Maximum amount of time to wait until the metric is marked as 'stale' and removed.",
-              "required": false,
-              "default": "\"5m\""
-            },
-            {
-              "name": "value",
-              "type": "string",
-              "doc": "If set, the metric only changes if source exactly matches the value.",
-              "required": false,
-              "default": "\"\""
-            }
+            
           ],
           "blocks": []
         },
@@ -17433,63 +17245,6 @@
           "blocks": []
         },
         {
-          "name": "action",
-          "doc": "Actions to take on the attributes of incoming metrics/logs/traces.",
-          "required": false,
-          "arguments": [
-            {
-              "name": "key",
-              "type": "string",
-              "doc": "The attribute that the action relates to.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "action",
-              "type": "string",
-              "doc": "The type of action performed.",
-              "required": true,
-              "default": null
-            },
-            {
-              "name": "value",
-              "type": "any",
-              "doc": "The value to populate for the key.",
-              "required": false,
-              "default": null
-            },
-            {
-              "name": "pattern",
-              "type": "string",
-              "doc": "A regex pattern.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "from_attribute",
-              "type": "string",
-              "doc": "The attribute from the input data used to populate the attribute value.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "from_context",
-              "type": "string",
-              "doc": "The context value used to populate the attribute value.",
-              "required": false,
-              "default": "\"\""
-            },
-            {
-              "name": "converted_type",
-              "type": "string",
-              "doc": "The type to convert the attribute value to.",
-              "required": false,
-              "default": "\"\""
-            }
-          ],
-          "blocks": []
-        },
-        {
           "name": "include",
           "doc": "Filter for data included in this processor's actions.",
           "required": false,
@@ -17849,6 +17604,64 @@
               "doc": "Controls the level of detail for metrics emitted by the wrapped collector.",
               "required": false,
               "default": "\"detailed\""
+            }
+          ],
+          "blocks": []
+        },
+        {
+          "name": "action",
+          "doc": "Actions to take on the attributes of incoming metrics/logs/traces.",
+          "required": false,
+          "unique": false,
+          "arguments": [
+            {
+              "name": "key",
+              "type": "string",
+              "doc": "The attribute that the action relates to.",
+              "required": true,
+              "default": null
+            },
+            {
+              "name": "action",
+              "type": "string",
+              "doc": "The type of action performed.",
+              "required": true,
+              "default": null
+            },
+            {
+              "name": "value",
+              "type": "any",
+              "doc": "The value to populate for the key.",
+              "required": false,
+              "default": null
+            },
+            {
+              "name": "pattern",
+              "type": "string",
+              "doc": "A regex pattern.",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "from_attribute",
+              "type": "string",
+              "doc": "The attribute from the input data used to populate the attribute value.",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "from_context",
+              "type": "string",
+              "doc": "The context value used to populate the attribute value.",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "converted_type",
+              "type": "string",
+              "doc": "The type to convert the attribute value to.",
+              "required": false,
+              "default": "\"\""
             }
           ],
           "blocks": []

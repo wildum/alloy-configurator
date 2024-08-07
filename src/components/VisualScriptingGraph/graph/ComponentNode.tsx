@@ -64,8 +64,11 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
   };
 
   const handleAddBlock = (block: BlockType) => {
-    const newBlock = structuredClone(block)
-    setBlocks((prevBlocks) => [...prevBlocks, { ...newBlock }]);
+    setBlocks((prevBlocks) => {
+          const newBlock = structuredClone(block)
+          prevBlocks.push(newBlock)
+        return prevBlocks
+      });
   };
 
   return (

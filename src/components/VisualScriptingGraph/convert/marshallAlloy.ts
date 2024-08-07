@@ -48,5 +48,5 @@ export function marshallToAlloyConfig(exportedData: ExportedNode[]): string {
         return `${name}${nodeLabel} {${argsContent}${blockContent}\n}`;
     };
 
-    return exportedData.map(formatNode).join('\n');
+    return exportedData.map(formatNode).join('\n\n');
 }

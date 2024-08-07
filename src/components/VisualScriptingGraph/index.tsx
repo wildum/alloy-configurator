@@ -173,7 +173,7 @@ const VisualScriptingGraph = () => {
             ...node,
             style: {
                 ...node.style,
-                boxShadow: selectedNodesIds.has(node.id) ? '0 0 0 2px #ff6b6b' : undefined,
+                boxShadow: selectedNodesIds.has(node.id) ? '0 0 0 2px #000000' : undefined,
             },
         })),
         [nodes, selectedNodesIds]);
@@ -183,7 +183,7 @@ const VisualScriptingGraph = () => {
             ...edge,
             style: {
                 ...edge.style,
-                stroke: selectedEdgesIds.has(edge.id) ? '#ff6b6b' : '#b1b1b7',
+                stroke: selectedEdgesIds.has(edge.id) ? '#000000' : '#b1b1b7',
                 strokeWidth: selectedEdgesIds.has(edge.id) ? 3 : 1,
             },
         })),
@@ -393,7 +393,6 @@ const VisualScriptingGraph = () => {
                     minZoom={0.01}
                 >
                     <Controls />
-                    <MiniMap />
                     <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
                 </ReactFlow>
             </div>
@@ -498,13 +497,13 @@ const styles = {
         right: 164px;
         z-index: 5;
         padding: 8px 12px;
-        background-color: #FFA500;
+        background-color: #007bff;
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
         &:hover {
-            background-color: #FF8C00;
+            background-color: #0056b3;
         }
     `,
     importButton: css`
@@ -536,13 +535,6 @@ const styles = {
         &:hover {
             background-color: #0056b3;
         }
-    `,
-    selectedNode: css`
-        box-shadow: 0 0 0 0px #ff6b6b;
-    `,
-    selectedEdge: css`
-        stroke: #ff6b6b;
-        stroke-width: 3;
     `,
     reactFlow: css`
         width: 100%;

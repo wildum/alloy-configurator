@@ -156,7 +156,6 @@ function buildEdges(nodes: Node[]): Edge[] {
 
 export function buildGraph(exportedNodes: ExportedNode[], components: Map<string, Map<string, Component>>): [Node[], Edge[]] {
     const nodes = buildNodes(exportedNodes, components)
-    console.log(nodes)
     const edges = buildEdges(nodes)
     return [nodes, edges]
 }
