@@ -22,7 +22,7 @@ import { Component, Argument as ArgumentType, Block as BlockType } from './compo
 import { marshallToAlloyConfig } from './convert/marshallAlloy';
 import { unmarshallFromAlloyConfig } from './convert/unmarshallAlloy';
 import { ExportedNode, ExportedArgument, ExportedBlock } from './convert/types'
-import { buildGraph } from './graph/buildGraph';
+import { buildGraph, getLayoutedElements } from './graph/buildGraph';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -223,11 +223,11 @@ const VisualScriptingGraph = () => {
         const exportData: ExportedNode[] = nodes.map(node => {
             const nodeData = node.data as Component;
             const nodeState = nodeStateManager.getNodeState(node.id);
-    
+
             if (!nodeState) return null;
-    
+
             const { checkedArgs, argValues } = nodeState;
-    
+
             const exportArgs = (args: ArgumentType[], checkedArgs: { [key: string]: boolean }, argValues: { [key: string]: { value: string; type: string } }): ExportedArgument[] => {
                 return Object.entries(checkedArgs)
                     .filter(([_, isChecked]) => isChecked)
@@ -236,16 +236,16 @@ const VisualScriptingGraph = () => {
                         value: argValues[argName]?.value || ''
                     }));
             };
-    
+
             const exportBlocks = (blocks: BlockType[], prefix: string): ExportedBlock[] => {
                 return blocks.reduce((acc, block) => {
                     const blockId = `${prefix}.${block.name}`;
                     const blockState = nodeStateManager.getNodeState(blockId);
-    
+
                     if (!blockState) return acc;
-    
+
                     const { checkedArgs: blockCheckedArgs, argValues: blockArgValues, isChecked } = blockState;
-    
+
                     if (isChecked || block.required) {
                         acc.push({
                             name: block.name,
@@ -253,11 +253,11 @@ const VisualScriptingGraph = () => {
                             blocks: exportBlocks(block.blocks, blockId)
                         });
                     }
-    
+
                     return acc;
                 }, [] as ExportedBlock[]);
             };
-    
+
             return {
                 name: nodeData.name,
                 label: nodeData.hasLabel ? nodeData.label : undefined,
@@ -265,7 +265,7 @@ const VisualScriptingGraph = () => {
                 blocks: exportBlocks(nodeData.blocks, node.id)
             };
         }).filter((node): node is ExportedNode => node !== null);
-    
+
         const alloyConfig = marshallToAlloyConfig(exportData);
         exportToFile(alloyConfig)
     }, [nodes]);
@@ -301,6 +301,12 @@ const VisualScriptingGraph = () => {
         }
     };
 
+    const layoutNode = () => {
+        const layout = getLayoutedElements(nodes, edges)
+        setNodes((nds) => layout.nodes);
+        setEdges((edg) => layout.edges);
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.componentPanel}>
@@ -335,6 +341,18 @@ const VisualScriptingGraph = () => {
             </div>
             <div className={styles.flowWrapper}>
                 <button
+                    className={styles.importButton}
+                    onClick={() => document.getElementById('file-input')?.click()}
+                >
+                    Import
+                </button>
+                <button
+                    className={styles.layoutButton}
+                    onClick={() => layoutNode()}
+                >
+                    Layout
+                </button>
+                <button
                     className={styles.exportButton}
                     onClick={handleExport}
                 >
@@ -346,12 +364,6 @@ const VisualScriptingGraph = () => {
                     disabled={selectedElements.nodes.length === 0 && selectedElements.edges.length === 0}
                 >
                     Delete Selected
-                </button>
-                <button
-                    className={styles.importButton}
-                    onClick={() => document.getElementById('file-input')?.click()}
-                >
-                    Import
                 </button>
                 <input
                     type="file"
@@ -476,7 +488,7 @@ const styles = {
     exportButton: css`
         position: absolute;
         top: 10px;
-        right: 150px;
+        right: 164px;
         z-index: 5;
         padding: 8px 12px;
         background-color: #FFA500;
@@ -491,7 +503,22 @@ const styles = {
     importButton: css`
         position: absolute;
         top: 10px;
-        right: 300px;
+        right: 247px;
+        z-index: 6;
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        &:hover {
+            background-color: #0056b3;
+        }
+    `,
+    layoutButton: css`
+        position: absolute;
+        top: 10px;
+        right: 331px;
         z-index: 6;
         padding: 8px 12px;
         background-color: #007bff;

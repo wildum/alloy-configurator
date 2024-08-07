@@ -3,17 +3,18 @@ import { Node, Edge } from '@xyflow/react';
 import { Component, Block, Argument } from "../components/types";
 import Dagre from '@dagrejs/dagre';
 
-const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
+export function getLayoutedElements(nodes: Node[], edges: Edge[]) {
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-    g.setGraph({});
+    g.setGraph({ rankdir: 'LR' });
 
     edges.forEach((edge) => g.setEdge(edge.source, edge.target));
-    nodes.forEach((node) =>
+    nodes.forEach((node) => {
         g.setNode(node.id, {
             ...node,
             width: node.measured?.width ?? 0,
             height: node.measured?.height ?? 0,
-        }),
+        })
+      }
     );
 
     Dagre.layout(g);
@@ -150,7 +151,5 @@ function buildEdges(nodes: Node[]): Edge[] {
 export function buildGraph(exportedNodes: ExportedNode[], components: Map<string, Map<string, Component>>): [Node[], Edge[]] {
     const nodes = buildNodes(exportedNodes, components)
     const edges = buildEdges(nodes)
-    const layout = getLayoutedElements(nodes, edges)
-
-    return [layout.nodes, layout.edges]
+    return [nodes, edges]
 }
