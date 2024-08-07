@@ -6,6 +6,8 @@ const tokenize = (input: string): string[] => {
         .replace(/\s*}\s*/g, ' } ')
         .replace(/\s*\[\s*/g, ' [ ')
         .replace(/\s*\]\s*/g, ' ] ')
+        .replace(/\s*\"\s*/g, ' " ')
+        .replace(/\s*\`\s*/g, ' ` ')
         .split(/\s+/)
         .filter(token => token.length > 0);
 };
@@ -14,27 +16,38 @@ const closingToken: { [key: string]: string } = {
     '{': '}',
     '[': ']',
     '"': '"',
-    '`': '`'
+    '`': '`',
+    'concat(': ')'
   };
-  
 
-const parseArguments = (tokens: string[], index: number): [string, number] => {
-    if (!(tokens[index] in closingToken)) {
-        return [tokens[index],  index+1];
-    }
-    const startToken = tokens[index++]
+const parseLongArg = (tokens: string[], index: number, startToken: string, endToken: string): [string, number] => {
     let tokenCount = 1
-    const endToken = closingToken[startToken]
-    let value = startToken
+    let value = ""
     while (index < tokens.length && tokenCount != 0) {
         if (tokens[index] == endToken) {
             tokenCount--
         } else if (tokens[index] == startToken) {
             tokenCount++
         }
-        value += tokens[index++]
+        value += tokens[index++] 
     }
-    return [value, index];
+    return [value, index]
+}
+  
+
+const parseArguments = (tokens: string[], index: number): [string, number] => {
+    if (!(tokens[index] in closingToken)) {
+        // special handling for maps
+        if (tokens[index+1] == '[') {
+            const [longArg, newIndex] = parseLongArg(tokens, index+2, '[', ']')
+            return [tokens[index]+'['+longArg, newIndex]
+        }
+        return [tokens[index],  index+1];
+    }
+    const startToken = tokens[index++]
+    const endToken = closingToken[startToken]
+    const [longArg, newIndex] = parseLongArg(tokens, index, startToken, endToken) 
+    return [startToken + longArg, newIndex];
 };
 
 const parseNodes = (tokens: string[]): ExportedNode[] => {
@@ -44,7 +57,9 @@ const parseNodes = (tokens: string[]): ExportedNode[] => {
         const name = tokens[index++];
         let label = undefined
         if (tokens[index] !== '{') {
-            label = tokens[index++].slice(1, -1)
+            index++ // skip the "
+            label = tokens[index++]
+            index++ // skip the "
         }
         nextToken(tokens[index++], '{')
         const [args, blocks, newIndex] = parseBody(index, tokens)

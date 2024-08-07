@@ -33969,48 +33969,6 @@
                   "doc": "Frequency to poll the URL for new sampling strategies.",
                   "required": false,
                   "default": "\"1m\""
-                },
-                {
-                  "name": "Name",
-                  "type": "Type",
-                  "doc": "Description",
-                  "required": false,
-                  "default": "Default"
-                },
-                {
-                  "name": "-------------------",
-                  "type": "----------------",
-                  "doc": "------------------------------------------------------------------",
-                  "required": false,
-                  "default": "---------"
-                },
-                {
-                  "name": "names",
-                  "type": "list(string)",
-                  "doc": "DNS names to look up.",
-                  "required": true,
-                  "default": null
-                },
-                {
-                  "name": "port",
-                  "type": "number",
-                  "doc": "Port to use for collecting metrics. Not used for SRV records.",
-                  "required": false,
-                  "default": "0"
-                },
-                {
-                  "name": "refresh_interval",
-                  "type": "duration",
-                  "doc": "How often to query DNS for updates.",
-                  "required": false,
-                  "default": "\"30s\""
-                },
-                {
-                  "name": "type",
-                  "type": "string",
-                  "doc": "Type of DNS record to query. Must be one of SRV, A, AAAA, or MX.",
-                  "required": false,
-                  "default": "\"SRV\""
                 }
               ],
               "blocks": []

@@ -385,6 +385,7 @@ const VisualScriptingGraph = () => {
                     onSelectionChange={onSelectionChange}
                     selectNodesOnDrag={true}
                     className={styles.reactFlow}
+                    minZoom={0.01}
                 >
                     <Controls />
                     <MiniMap />
