@@ -185,6 +185,7 @@ export class MarkdownComponentDataSource {
                     name: name,
                     doc: parts[2],
                     setOnLoad: false,
+                    unique: false,
                     required: parts[3].toLowerCase() === "yes",
                     arguments: blockMap.get(name) || [],
                     blocks: []
@@ -208,6 +209,7 @@ export class MarkdownComponentDataSource {
                         required: parts[3].toLowerCase() === "yes",
                         arguments: blockMap.get(name) || [],
                         setOnLoad: false,
+                        unique: false,
                         blocks: []
                     })
                 } else {

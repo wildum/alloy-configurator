@@ -46,27 +46,33 @@ function searchInChildren(parentMap: Map<string, Map<string, Component>>, search
   }
 
   const mapBlocks = (exportedBlocks: ExportedBlock[], componentBlocks: Block[]): Block[] => {
-    return componentBlocks.map(componentBlock => {
-      const exportedBlock = exportedBlocks.find(b => b.name === componentBlock.name);
-      if (exportedBlock === undefined) {
-        return componentBlock;
+    const newComponentBlocks: Block[] = []
+    componentBlocks.forEach(componentBlock => {
+      const matchingExportedBlocks = exportedBlocks.filter(b => b.name === componentBlock.name);
+      if (matchingExportedBlocks === undefined || matchingExportedBlocks.length == 0) {
+        newComponentBlocks.push(componentBlock)
+        return
       }
 
-      componentBlock.setOnLoad = true
+      matchingExportedBlocks.forEach(exportedBlock => {
+        let copy = structuredClone(componentBlock)
+        copy.setOnLoad = true
       
-      componentBlock.arguments.forEach(arg => {
-        exportedBlock.arguments.forEach((exportedArg: ExportedArgument) => {
-          if (arg.name === exportedArg.name) {
-            arg.default = exportedArg.value;
-            arg.setOnLoad = true
-          }
+        copy.arguments.forEach((arg: Argument) => {
+          exportedBlock.arguments.forEach((exportedArg: ExportedArgument) => {
+            if (arg.name === exportedArg.name) {
+              arg.default = exportedArg.value;
+              arg.setOnLoad = true
+            }
+          });
         });
-      });
-      
-      componentBlock.blocks = mapBlocks(exportedBlock.blocks, componentBlock.blocks);
-      
-      return componentBlock;
-    }).filter((block): block is Block => block !== null && block !== undefined);
+
+        newComponentBlocks.push(copy)
+        
+        copy.blocks = mapBlocks(exportedBlock.blocks, copy.blocks);
+      })
+    })
+    return newComponentBlocks
   };
 
 const buildNodes = (exportedNodes: ExportedNode[], components: Map<string, Map<string, Component>>): Node[] => {
@@ -136,8 +142,8 @@ function buildEdges(nodes: Node[]): Edge[] {
                 });
             }
         });
-        block.blocks.forEach(nestedBlock => {
-            checkArgumentsAndBlocks(component, nestedBlock, `${parentPath}.${nestedBlock.name}`);
+        block.blocks.forEach((nestedBlock, index) => {
+            checkArgumentsAndBlocks(component, nestedBlock, `${parentPath}.${nestedBlock.name}${index}`);
         });
     }
 
@@ -150,6 +156,7 @@ function buildEdges(nodes: Node[]): Edge[] {
 
 export function buildGraph(exportedNodes: ExportedNode[], components: Map<string, Map<string, Component>>): [Node[], Edge[]] {
     const nodes = buildNodes(exportedNodes, components)
+    console.log(nodes)
     const edges = buildEdges(nodes)
     return [nodes, edges]
 }

@@ -7,11 +7,14 @@ import nodeStateManager from './nodeStateManager';
 type BlockProps = {
     block: BlockType;
     prefix: string;
-};
+    onAddBlock: (block: BlockType) => void;
+    index: number;
+  };
 
-const Block: React.FC<BlockProps> = ({ block, prefix }) => {
-    const id = `${prefix}.${block.name}`;
+const Block: React.FC<BlockProps> = ({ block, prefix, onAddBlock, index }) => {
+    const id = `${prefix}.${block.name}${index}`;
     const [isChecked, setIsChecked] = useState(block.required || block.setOnLoad);
+    const [blocks, setBlocks] = useState<BlockType[]>(block.blocks);
 
     const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
         block.arguments.reduce((acc, arg) => {
@@ -39,7 +42,8 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
             setArgValues,
             getArgValues: () => argValues,
             exportTypes,
-            isChecked: () => isChecked
+            isChecked: () => isChecked,
+            getBlocks: () => blocks,
         });
         return () => {
             nodeStateManager.setFn(id, null);
@@ -61,6 +65,11 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
         setIsChecked(e.target.checked);
     };
 
+    const handleAddBlock = (block: BlockType) => {
+        const newBlock = structuredClone(block)
+        setBlocks((prevBlocks) => [...prevBlocks, { ...newBlock }]);
+      };
+
     return (
         <div className="blockContainer">
             <div className="blockHeader">
@@ -72,6 +81,9 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
                     disabled={block.required}
                 />
                 <strong className="blockName">{block.name}</strong>
+                {(block.unique !== undefined && !block.unique) && (
+                    <button onClick={() => onAddBlock(block)} className="add-button">+</button>
+                )}
             </div>
             {isChecked && (
                 <div className="blockContent">
@@ -93,14 +105,16 @@ const Block: React.FC<BlockProps> = ({ block, prefix }) => {
                             </ul>
                         </div>
                     )}
-                    {block.blocks.length > 0 && (
+                    {blocks.length > 0 && (
                         <div className="nestedBlocksSection">
                             <ul className="nestedBlocksList">
-                                {block.blocks.map((b, index) => (
+                                {blocks.map((b, index) => (
                                     <Block
                                         key={index}
                                         block={b}
                                         prefix={id}
+                                        onAddBlock={handleAddBlock}
+                                        index={index}
                                     />
                                 ))}
                             </ul>

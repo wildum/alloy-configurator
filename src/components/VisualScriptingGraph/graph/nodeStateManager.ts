@@ -1,9 +1,12 @@
+import { Block } from "../components/types";
+
 type SetCheckedArgs = React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>;
 type SetArgValues = React.Dispatch<React.SetStateAction<{ [key: string]: { value: string; type: string } }>>;
 type GetCheckedArgs = () => { [key: string]: boolean };
 type GetArgValues = () => { [key: string]: { value: string; type: string } };
 type ExportTypes =  {[key: string]: string};
 type isChecked = () => boolean
+type GetBlocks = () => Block[]
 
 type Fns = {
   setCheckedArgs: SetCheckedArgs;
@@ -12,6 +15,7 @@ type Fns = {
   isChecked: isChecked;
   getArgValues: GetArgValues;
   getCheckedArgs: GetCheckedArgs;
+  getBlocks: GetBlocks;
 } | null;
 
 const nodeStateManager = {
@@ -29,7 +33,8 @@ const nodeStateManager = {
           checkedArgs: fns.getCheckedArgs(),
           argValues: fns.getArgValues(),
           isChecked: fns.isChecked(),
-          ExportTypes: fns.exportTypes
+          ExportTypes: fns.exportTypes,
+          blocks: fns.getBlocks(),
         };
       }
       return null;

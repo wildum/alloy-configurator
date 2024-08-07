@@ -22,7 +22,7 @@ const closingToken: { [key: string]: string } = {
 
 const parseArguments = (tokens: string[], index: number): [string, number] => {
     if (!(tokens[index] in closingToken)) {
-        return [tokens[index],  index++];
+        return [tokens[index],  index+1];
     }
     const startToken = tokens[index++]
     let tokenCount = 1

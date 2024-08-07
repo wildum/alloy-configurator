@@ -18,7 +18,7 @@ import { css } from '@emotion/css';
 import '@xyflow/react/dist/style.css';
 import ComponentNode from './graph/ComponentNode';
 import nodeStateManager from './graph/nodeStateManager';
-import { Component, Argument as ArgumentType, Block as BlockType } from './components/types';
+import { Component, Argument as ArgumentType, Block as BlockType, compareTypes } from './components/types';
 import { marshallToAlloyConfig } from './convert/marshallAlloy';
 import { unmarshallFromAlloyConfig } from './convert/unmarshallAlloy';
 import { ExportedNode, ExportedArgument, ExportedBlock } from './convert/types'
@@ -87,7 +87,8 @@ const VisualScriptingGraph = () => {
                             const targetType = prevTarget[targetArg].type;
                             const targetValue = prevTarget[targetArg].value;
 
-                            if (sourceType === targetType) {
+                            // TODO: improve this
+                            if (compareTypes(sourceType, targetType)) {
                                 if (targetType.startsWith("list(") || targetType.startsWith("array")) {
                                     if (targetValue == undefined || targetValue == "[]" || targetValue == "null" || targetValue == "") {
                                         newValues[targetArg] = { value: newValue, type: targetType };
@@ -226,7 +227,7 @@ const VisualScriptingGraph = () => {
 
             if (!nodeState) return null;
 
-            const { checkedArgs, argValues } = nodeState;
+            const { checkedArgs, argValues, blocks } = nodeState;
 
             const exportArgs = (args: ArgumentType[], checkedArgs: { [key: string]: boolean }, argValues: { [key: string]: { value: string; type: string } }): ExportedArgument[] => {
                 return Object.entries(checkedArgs)
@@ -238,19 +239,19 @@ const VisualScriptingGraph = () => {
             };
 
             const exportBlocks = (blocks: BlockType[], prefix: string): ExportedBlock[] => {
-                return blocks.reduce((acc, block) => {
-                    const blockId = `${prefix}.${block.name}`;
+                return blocks.reduce((acc, block, index) => {
+                    const blockId = `${prefix}.${block.name}${index}`;
                     const blockState = nodeStateManager.getNodeState(blockId);
 
                     if (!blockState) return acc;
 
-                    const { checkedArgs: blockCheckedArgs, argValues: blockArgValues, isChecked } = blockState;
+                    const { checkedArgs: blockCheckedArgs, argValues: blockArgValues, isChecked, blocks: nestedBlocks } = blockState;
 
                     if (isChecked || block.required) {
                         acc.push({
                             name: block.name,
                             arguments: exportArgs(block.arguments, blockCheckedArgs, blockArgValues),
-                            blocks: exportBlocks(block.blocks, blockId)
+                            blocks: exportBlocks(nestedBlocks, blockId)
                         });
                     }
 
@@ -262,7 +263,7 @@ const VisualScriptingGraph = () => {
                 name: nodeData.name,
                 label: nodeData.hasLabel ? nodeData.label : undefined,
                 arguments: exportArgs(nodeData.arguments, checkedArgs, argValues),
-                blocks: exportBlocks(nodeData.blocks, node.id)
+                blocks: exportBlocks(blocks, node.id)
             };
         }).filter((node): node is ExportedNode => node !== null);
 

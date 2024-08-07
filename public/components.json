@@ -1309,6 +1309,7 @@
           "name": "filter",
           "doc": "Filters discoverable resources.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "name",
@@ -1710,6 +1711,7 @@
           "name": "filter",
           "doc": "Optional filter to limit the discovery process to a subset of available resources.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "name",
@@ -2197,6 +2199,7 @@
           "name": "filter",
           "doc": "Filters discoverable resources.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "name",
@@ -4487,6 +4490,7 @@
           "name": "selectors",
           "doc": "Information about which Kubernetes namespaces to search.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "role",
@@ -7246,6 +7250,7 @@
           "name": "rule",
           "doc": "Relabeling rules to apply to targets.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "action",
@@ -7986,6 +7991,7 @@
               "name": "location",
               "doc": "Configures on-disk location for sourcemap retrieval.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "path",
@@ -9009,6 +9015,7 @@
           "name": "rule",
           "doc": "Relabeling rules to apply to received log entries.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "action",
@@ -9152,6 +9159,7 @@
               "name": "match_expression",
               "doc": "Label match expression for Namespace resources.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -9189,6 +9197,7 @@
               "name": "match_expression",
               "doc": "Label match expression for PrometheusRule resources.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -12370,6 +12379,7 @@
               "name": "match_expression",
               "doc": "Label selector expression for which PodLogs to discover.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -12407,6 +12417,7 @@
               "name": "match_expression",
               "doc": "Label selector expression for which namespaces to discover PodLogs in.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -12729,6 +12740,7 @@
           "name": "endpoint",
           "doc": "Location to send logs to.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "url",
@@ -13331,6 +13343,7 @@
               "name": "match_expression",
               "doc": "Label match expression for Namespace resources.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -13368,6 +13381,7 @@
               "name": "match_expression",
               "doc": "Label match expression for PrometheusRule resources.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -13799,6 +13813,7 @@
           "name": "header",
           "doc": "Custom header to attach to requests.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "key",
@@ -14517,6 +14532,7 @@
           "name": "dimension",
           "doc": "Dimensions to be added in addition to the default ones.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "default",
@@ -14553,6 +14569,7 @@
               "name": "dimension",
               "doc": "Span event attributes to add as dimensions to the events metric, _on top of_ the default ones and the ones configured in the top-level dimension block.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "default",
@@ -15376,6 +15393,7 @@
               "name": "static",
               "doc": "Static list of endpoints to export to.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "hostnames",
@@ -17553,6 +17571,7 @@
               "name": "attribute",
               "doc": "A list of attributes to match against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -17575,6 +17594,7 @@
               "name": "resource",
               "doc": "A list of items to match the resources against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -17597,6 +17617,7 @@
               "name": "library",
               "doc": "A list of items to match the implementation library against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "name",
@@ -17721,6 +17742,7 @@
               "name": "attribute",
               "doc": "A list of attributes to match against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -17743,6 +17765,7 @@
               "name": "resource",
               "doc": "A list of items to match the resources against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -17765,6 +17788,7 @@
               "name": "library",
               "doc": "A list of items to match the implementation library against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "name",
@@ -18274,6 +18298,7 @@
               "name": "annotation",
               "doc": "Creating resource attributes from Kubernetes annotations.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "from",
@@ -18317,6 +18342,7 @@
               "name": "label",
               "doc": "Creating resource attributes from Kubernetes labels.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -18348,6 +18374,7 @@
           "name": "filter",
           "doc": "Filters the data loaded from Kubernetes.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "node",
@@ -18369,6 +18396,7 @@
               "name": "field",
               "doc": "Filter pods by generic Kubernetes fields.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -18398,6 +18426,7 @@
               "name": "label",
               "doc": "Filter pods by Kubernetes labels.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -18465,6 +18494,7 @@
               "name": "pod",
               "doc": "Pod information.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "name",
@@ -19123,6 +19153,7 @@
               "name": "attribute",
               "doc": "A list of attributes to match against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -19145,6 +19176,7 @@
               "name": "resource",
               "doc": "A list of items to match the resources against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -19167,6 +19199,7 @@
               "name": "library",
               "doc": "A list of items to match the implementation library against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "name",
@@ -19248,6 +19281,7 @@
               "name": "attribute",
               "doc": "A list of attributes to match against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -19270,6 +19304,7 @@
               "name": "resource",
               "doc": "A list of items to match the resources against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -19292,6 +19327,7 @@
               "name": "library",
               "doc": "A list of items to match the implementation library against.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "name",
@@ -19929,6 +19965,7 @@
                   "name": "composite_sub_policy",
                   "doc": "A set of policies underneath a composite policy type.",
                   "required": false,
+                  "unique": false,
                   "arguments": [
                     {
                       "name": "name",
@@ -20746,6 +20783,7 @@
                   "name": "metrics_include",
                   "doc": "Metrics to include the file.name resource attribute in.",
                   "required": false,
+                  "unique": false,
                   "arguments": [
                     {
                       "name": "strict",
@@ -20768,6 +20806,7 @@
                   "name": "metrics_exclude",
                   "doc": "Metrics to exclude the file.name resource attribute from.",
                   "required": false,
+                  "unique": false,
                   "arguments": [
                     {
                       "name": "strict",
@@ -20806,6 +20845,7 @@
                   "name": "metrics_include",
                   "doc": "Metrics to include the file.path resource attribute in.",
                   "required": false,
+                  "unique": false,
                   "arguments": [
                     {
                       "name": "strict",
@@ -20828,6 +20868,7 @@
                   "name": "metrics_exclude",
                   "doc": "Metrics to exclude the file.path resource attribute from.",
                   "required": false,
+                  "unique": false,
                   "arguments": [
                     {
                       "name": "strict",
@@ -23981,6 +24022,7 @@
           "name": "discovery",
           "doc": "Configures a discovery job. Multiple jobs can be configured.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "regions",
@@ -24030,6 +24072,7 @@
               "name": "role",
               "doc": "Configures the IAM roles the job should assume to scrape metrics. Defaults to the role configured in the environment {{< param \"PRODUCT_NAME\" >}} runs on.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "role_arn",
@@ -24097,6 +24140,7 @@
           "name": "static",
           "doc": "Configures a static job. Multiple jobs can be configured.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "regions",
@@ -24139,6 +24183,7 @@
               "name": "role",
               "doc": "Configures the IAM roles the job should assume to scrape metrics. Defaults to the role configured in the environment {{< param \"PRODUCT_NAME\" >}} runs on.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "role_arn",
@@ -25452,6 +25497,7 @@
           "name": "matcher",
           "doc": "A collection of matching rules to use for deciding which processes to monitor.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "name",
@@ -27256,6 +27302,7 @@
           "name": "rule",
           "doc": "Relabeling rules to apply to discovered targets.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "action",
@@ -27349,6 +27396,7 @@
               "name": "match_expression",
               "doc": "Label selector expression for which PodMonitors to discover.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -27777,6 +27825,7 @@
           "name": "rule",
           "doc": "Relabeling rules to apply to discovered targets.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "action",
@@ -27870,6 +27919,7 @@
               "name": "match_expression",
               "doc": "Label selector expression for which Probes to discover.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -28298,6 +28348,7 @@
           "name": "rule",
           "doc": "Relabeling rules to apply to discovered targets.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "action",
@@ -28391,6 +28442,7 @@
               "name": "match_expression",
               "doc": "Label selector expression for which ServiceMonitors to discover.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "key",
@@ -28539,6 +28591,7 @@
           "name": "rule",
           "doc": "Relabeling rules to apply to received metrics.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "action",
@@ -28619,6 +28672,7 @@
           "name": "endpoint",
           "doc": "Location to send metrics to.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "url",
@@ -29177,6 +29231,7 @@
               "name": "write_relabel_config",
               "doc": "Configuration for write_relabel_config.",
               "required": false,
+              "unique": false,
               "arguments": [
                 {
                   "name": "action",
@@ -30679,6 +30734,7 @@
           "name": "endpoint",
           "doc": "Location to send profiles to.",
           "required": false,
+          "unique": false,
           "arguments": [
             {
               "name": "url",

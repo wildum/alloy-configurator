@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Component } from '../components/types';
+import { Component, Block as BlockType } from '../components/types';
 import Argument from './Argument';
 import Export from './Export';
 import Block from './Block';
@@ -12,6 +12,7 @@ type ComponentNodeProps = {
 };
 
 const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
+  const [blocks, setBlocks] = useState<BlockType[]>(data.blocks);
   const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
     data.arguments.reduce((acc, arg) => {
       acc[arg.name] = arg.required || arg.setOnLoad;
@@ -43,7 +44,8 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
       setArgValues,
       getArgValues: () => argValues,
       exportTypes,
-      isChecked: () => true
+      isChecked: () => true,
+      getBlocks: () => blocks,
     });
     return () => {
       nodeStateManager.setFn(id, null)
@@ -59,6 +61,11 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
       ...prev,
       [name]: { ...prev[name], value }
     }));
+  };
+
+  const handleAddBlock = (block: BlockType) => {
+    const newBlock = structuredClone(block)
+    setBlocks((prevBlocks) => [...prevBlocks, { ...newBlock }]);
   };
 
   return (
@@ -85,17 +92,20 @@ const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
           </ul>
         </div>
       )}
-      {data.blocks.length > 0 && (
+      {blocks.length > 0 && (
         <div>
           <hr />
           <ul className="no-bullets">
-            {data.blocks.map((block, index) => (
+            {blocks.map((block, index) => {
+              return (
               <Block
                 key={index}
                 block={block}
                 prefix={id}
+                onAddBlock={handleAddBlock}
+                index={index}
               />
-            ))}
+            )})}
           </ul>
         </div>
       )}
