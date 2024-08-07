@@ -6,8 +6,6 @@ const tokenize = (input: string): string[] => {
         .replace(/\s*}\s*/g, ' } ')
         .replace(/\s*\[\s*/g, ' [ ')
         .replace(/\s*\]\s*/g, ' ] ')
-        .replace(/\s*"\s*/g, ' " ')
-        .replace(/\s*`\s*/g, ' ` ')
         .split(/\s+/)
         .filter(token => token.length > 0);
 };
@@ -45,10 +43,8 @@ const parseNodes = (tokens: string[]): ExportedNode[] => {
     while (index < tokens.length) {
         const name = tokens[index++];
         let label = undefined
-        if (tokens[index] === '"') {
-            index++
-            label = tokens[index++]
-            nextToken(tokens[index++], '"')
+        if (tokens[index] !== '{') {
+            label = tokens[index++].slice(1, -1)
         }
         nextToken(tokens[index++], '{')
         const [args, blocks, newIndex] = parseBody(index, tokens)

@@ -33556,8 +33556,16 @@
     "livedebugging": {
       "name": "livedebugging",
       "doc": "`livedebugging` is an optional configuration block that enables the [live debugging feature][debug], which streams real-time data from your components directly to the {{< param \"PRODUCT_NAME\" >}} UI.",
-      "arguments": [],
-      "hasLabel": true,
+      "arguments": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "doc": "Whether to enable livedebugging.",
+          "required": false,
+          "default": "false"
+        }
+      ],
+      "hasLabel": false,
       "exports": [],
       "blocks": []
     },

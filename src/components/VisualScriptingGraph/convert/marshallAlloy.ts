@@ -1,12 +1,20 @@
 import { ExportedNode, ExportedArgument, ExportedBlock } from "./types";
 
+function removeTrailingCommaIfExists(input: string): string {
+    const regex = /,\]$/;
+    return input.replace(regex, "]");
+  }
+
 export function marshallToAlloyConfig(exportedData: ExportedNode[]): string {
     const INDENTATION = '    ';
 
     const formatArguments = (args: ExportedArgument[], indentLevel: number): string => {
         const indent = INDENTATION.repeat(indentLevel);
-        return args.map(arg => `${indent}${arg.name} = ${arg.value}`).join('\n');
-    };
+        return args.map(arg => {
+                const argValue = removeTrailingCommaIfExists(arg.value)
+                return `${indent}${arg.name} = ${argValue}`
+            }).join('\n');
+        }
 
     const formatBlocks = (blocks: ExportedBlock[], prefix: string, indentLevel: number): string => {
         const indent = INDENTATION.repeat(indentLevel);
