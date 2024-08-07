@@ -194,30 +194,35 @@ const VisualScriptingGraph = () => {
 
         const updates = selectedElements.edges.map((edge) => {
             const targetNode = nodes.find(node => node.id === edge.target);
-            const targetHandle = edge.targetHandle?.split('-')[0];
-
-            if (targetNode && targetHandle) {
-                const setters = nodeStateManager.getFns(edge.target);
+            const targetHandleParts = edge.targetHandle?.split('.');
+            const targetHandle = targetHandleParts?.slice(0, -1).join('.');
+            
+            if (targetNode && targetHandle && targetHandleParts && edge.sourceHandle) {
+                const setters = nodeStateManager.getFns(targetHandle);
                 if (setters) {
-                    const isRequired = (targetNode.data as Component).arguments.find((arg: ArgumentType) => arg.name === targetHandle)?.required;
-                    return { setters, targetHandle, isRequired };
+                    const targetArg = targetHandleParts[targetHandleParts.length - 1].split("-")[0];
+                    const fullExport = edge.sourceHandle.split("-")[0];
+                    return { setters, targetArg, fullExport };
                 }
             }
             return null;
-        }).filter(update => update !== null) as { setters: any, targetHandle: string, isRequired: boolean }[];
-
-        setEdges((eds) => eds.filter((edge) => !selectedElements.edges.some((e) => e.id === edge.id)));
+        }).filter(update => update !== null) as { setters: any, targetArg: string, fullExport: string }[];
 
         setTimeout(() => {
-            updates.forEach(({ setters, targetHandle, isRequired }) => {
-                if (isRequired) {
-                    setters.setCheckedArgs((prev: any) => ({ ...prev, [targetHandle]: true }));
-                } else {
-                    setters.setCheckedArgs((prev: any) => ({ ...prev, [targetHandle]: false }));
-                }
-                setters.setArgValues((prev: any) => ({ ...prev, [targetHandle]: '' }));
+            updates.forEach(({ setters, targetArg, fullExport }) => {
+                setters.setArgValues((prev: any) => {
+                    const prevValues = prev
+                    const newValue = prevValues[targetArg]
+                        .value
+                        .replace(new RegExp(`(\\s*,\\s*\\b${fullExport}\\b)|(\\b${fullExport}\\b\\s*,\\s*)|\\b${fullExport}\\b`, 'g'), '')
+                        .trim();
+                    prevValues[targetArg].value = newValue
+                    return prevValues;
+                });
             });
         }, 0);
+
+        setEdges((eds) => eds.filter((edge) => !selectedElements.edges.some((e) => e.id === edge.id)));
     }, [selectedElements, setNodes, setEdges, nodes]);
 
     const handleExport = useCallback(() => {

@@ -39,6 +39,5 @@ const normalizeType = (type: string) => {
 };
 
 export function compareTypes(sourceType: string, targetType: string) {
-    console.log(normalizeType(sourceType), normalizeType(targetType))
     return normalizeType(sourceType) === normalizeType(targetType);
 };
