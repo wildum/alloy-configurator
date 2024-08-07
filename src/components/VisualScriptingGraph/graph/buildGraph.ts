@@ -51,12 +51,13 @@ function searchInChildren(parentMap: Map<string, Map<string, Component>>, search
         return componentBlock;
       }
 
-      // TODO: check the block
+      componentBlock.setOnLoad = true
       
       componentBlock.arguments.forEach(arg => {
         exportedBlock.arguments.forEach((exportedArg: ExportedArgument) => {
           if (arg.name === exportedArg.name) {
             arg.default = exportedArg.value;
+            arg.setOnLoad = true
           }
         });
       });
@@ -83,6 +84,7 @@ const buildNodes = (exportedNodes: ExportedNode[], components: Map<string, Map<s
           copy.arguments.forEach((copyArg: Argument) => {
             if (arg.name === copyArg.name) {
               copyArg.default = arg.value;
+              copyArg.setOnLoad = true;
             }
           });
         });

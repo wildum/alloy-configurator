@@ -6,8 +6,8 @@ const componentArray: Component[] = [
         doc: "This is the first example component",
         hasLabel: true,
         arguments: [
-            { name: "arg1", type: "string", doc: "A sample argument", required: true, default: "defaultValue1" },
-            { name: "arg2", type: "string", doc: "A sample argument", required: false, default: "" }
+            { name: "arg1", type: "string", doc: "A sample argument", setOnLoad: false, required: true, default: "defaultValue1" },
+            { name: "arg2", type: "string", doc: "A sample argument", setOnLoad: false, required: false, default: "" }
         ],
         exports: [
             { name: "export1", type: "string", doc: "A sample export" }
@@ -19,7 +19,7 @@ const componentArray: Component[] = [
         doc: "This is the second example component",
         hasLabel: true,
         arguments: [
-            { name: "arg2", type: "number", doc: "Another sample argument", required: false, default: 42 }
+            { name: "arg2", type: "number", doc: "Another sample argument", setOnLoad: false, required: false, default: 42 }
         ],
         exports: [
             { name: "export2", type: "number", doc: "Another sample export" }

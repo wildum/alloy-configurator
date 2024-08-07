@@ -11,11 +11,11 @@ type BlockProps = {
 
 const Block: React.FC<BlockProps> = ({ block, prefix }) => {
     const id = `${prefix}.${block.name}`;
-    const [isChecked, setIsChecked] = useState(block.required);
+    const [isChecked, setIsChecked] = useState(block.required || block.setOnLoad);
 
     const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
         block.arguments.reduce((acc, arg) => {
-            acc[arg.name] = arg.required;
+            acc[arg.name] = arg.required || arg.setOnLoad;
             return acc;
         }, {} as { [key: string]: boolean })
     );

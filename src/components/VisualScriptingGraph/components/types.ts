@@ -12,6 +12,7 @@ export type Argument = {
     name: string;
     type: string;
     doc: string;
+    setOnLoad: boolean;
     required: boolean;
     default: any;
 };
@@ -26,6 +27,7 @@ export type Block = {
     name: string;
     doc: string;
     required: boolean;
+    setOnLoad: boolean;
     arguments: Argument[];
     blocks: Block[];
 };

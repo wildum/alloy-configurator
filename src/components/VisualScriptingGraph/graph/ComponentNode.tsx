@@ -14,7 +14,7 @@ type ComponentNodeProps = {
 const ComponentNode: React.FC<ComponentNodeProps> = ({ data, id }) => {
   const [checkedArgs, setCheckedArgs] = useState<{ [key: string]: boolean }>(() =>
     data.arguments.reduce((acc, arg) => {
-      acc[arg.name] = arg.required;
+      acc[arg.name] = arg.required || arg.setOnLoad;
       return acc;
     }, {} as { [key: string]: boolean })
   );

@@ -155,6 +155,7 @@ export class MarkdownComponentDataSource {
                 type: parts[1],
                 doc: parts[2],
                 required: parts[4].toLowerCase() === 'yes',
+                setOnLoad: false,
                 default: parts[3] || null,
             });
         }
@@ -183,6 +184,7 @@ export class MarkdownComponentDataSource {
                 let block: Block = {
                     name: name,
                     doc: parts[2],
+                    setOnLoad: false,
                     required: parts[3].toLowerCase() === "yes",
                     arguments: blockMap.get(name) || [],
                     blocks: []
@@ -205,6 +207,7 @@ export class MarkdownComponentDataSource {
                         doc: parts[2],
                         required: parts[3].toLowerCase() === "yes",
                         arguments: blockMap.get(name) || [],
+                        setOnLoad: false,
                         blocks: []
                     })
                 } else {

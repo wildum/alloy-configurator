@@ -292,8 +292,6 @@ const VisualScriptingGraph = () => {
                     const content = e.target.result as string
                     const exportedNodes = unmarshallFromAlloyConfig(content);
                     const [nodes, edges] = buildGraph(exportedNodes, components)
-                    console.log(nodes)
-                    console.log(edges)
                     setNodes((nds) => nodes);
                     setEdges((edg) => edges);
                 }
