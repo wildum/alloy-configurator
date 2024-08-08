@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Component, Argument, Export, Block } from './types';
 
+// This was used to build a dataset. The dataset is not perfect.
 export class MarkdownComponentDataSource {
     version: string
     constructor(version: string) {
