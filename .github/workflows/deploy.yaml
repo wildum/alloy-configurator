@@ -5,6 +5,8 @@ on:
     branches: ["main"]
 
   workflow_dispatch:
+env:
+  REACT_APP_CONVERT_ENDPOINT: 'https://alloy-configurator-wcwoo.ondigitalocean.app/convert'
 
 permissions:
   contents: read
