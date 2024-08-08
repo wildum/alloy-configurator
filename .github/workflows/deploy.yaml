@@ -68,6 +68,8 @@ jobs:
           node-version: 18
       - run: npm ci --force # needed for react-hook-form to play nicely with newer react versions
       - run: npm run-script build
+        env:
+          CI: false
         # Deployment
       - name: Setup Pages
         uses: actions/configure-pages@v3
